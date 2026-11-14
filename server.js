@@ -8,8 +8,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// قاعدة بيانات محلية مؤقتة (متاجر + 30 كود عشوائي وصعب)
+// قاعدة بيانات محلية مؤقتة (متاجر + الأكواد + إعدادات المنصة)
 let stores = [];
+
+// إعدادات المنصة الافتراضية (الشعار وروابط التواصل)
+let siteSettings = {
+    logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
+    whatsapp: "213700000000",
+    instagram: "https://instagram.com",
+    facebook: "https://facebook.com",
+    telegram: "https://t.me"
+};
 
 let activeCodes = [
     "CS-9X4F-7B2K", "CS-3M8R-9P1W", "CS-5V2X-4H8N", "CS-1K9L-6D3Z", "CS-8T4Y-2F5X",
@@ -21,6 +30,22 @@ let activeCodes = [
 ];
 
 let usedCodes = [];
+
+// مسار جلب إعدادات المنصة لواجهة الزوار
+app.get('/api/settings', (req, res) => {
+    res.json(siteSettings);
+});
+
+// مسار تحديث الإعدادات من لوحة التحكم
+app.post('/admin/settings', (req, res) => {
+    const { logoUrl, whatsapp, instagram, facebook, telegram } = req.body;
+    if (logoUrl) siteSettings.logoUrl = logoUrl;
+    if (whatsapp) siteSettings.whatsapp = whatsapp;
+    if (instagram) siteSettings.instagram = instagram;
+    if (facebook) siteSettings.facebook = facebook;
+    if (telegram) siteSettings.telegram = telegram;
+    res.redirect('/admin/dashboard');
+});
 
 // مسار تسجيل متجر جديد
 app.post('/register', (req, res) => {
@@ -77,7 +102,7 @@ app.post('/admin/login', (req, res) => {
     }
 });
 
-// لوحة التحكم (تمت إزالة سطر عرض كلمة المرور نهائياً لتصبح نظيفة)
+// لوحة التحكم تعرض الأكواد، المتاجر، ونموذج إعدادات الشعار والسوشيال ميديا
 app.get('/admin/dashboard', (req, res) => {
     res.send(`
         <html dir="rtl" lang="ar">
@@ -86,9 +111,15 @@ app.get('/admin/dashboard', (req, res) => {
             <title>لوحة التحكم - ClickShop</title>
             <style>
                 body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
-                .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-                ul { text-align: right; padding-right: 20px; max-height: 150px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
+                .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
+                .box h2, .box h3 { text-align: center; }
+                ul { padding-right: 20px; max-height: 130px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
                 li { margin-bottom: 5px; font-family: monospace; font-size: 14px; color: #1f2937; }
+                .form-group { margin-bottom: 12px; }
+                label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #374151; }
+                input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px; }
+                .btn { background: #008060; color: white; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+                .btn:hover { background: #006e52; }
             </style>
         </head>
         <body>
@@ -96,6 +127,34 @@ app.get('/admin/dashboard', (req, res) => {
                 <h2 style="color: #008060;">لوحة تحكم مدير منصة ClickShop</h2>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
                 
+                <!-- قسم إعدادات الشعار وروابط التواصل الاجتماعي -->
+                <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات الشعار ومواقع التواصل</h3>
+                <form action="/admin/settings" method="POST">
+                    <div class="form-group">
+                        <label>رابط صورة الشعار (Logo URL):</label>
+                        <input type="text" name="logoUrl" value="${siteSettings.logoUrl}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الواتساب (مثال: 213700000000):</label>
+                        <input type="text" name="whatsapp" value="${siteSettings.whatsapp}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رابط إنستغرام:</label>
+                        <input type="text" name="instagram" value="${siteSettings.instagram}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رابط فيسبوك:</label>
+                        <input type="text" name="facebook" value="${siteSettings.facebook}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رابط تلغرام:</label>
+                        <input type="text" name="telegram" value="${siteSettings.telegram}" required>
+                    </div>
+                    <button type="submit" class="btn">حفظ وتحديث الإعدادات 💾</button>
+                </form>
+            </div>
+
+            <div class="box">
                 <h3 style="color: #059669;">الأكواد الصعبة المتاحة (${activeCodes.length}):</h3>
                 <ul>
                     ${activeCodes.map(code => `<li>${code}</li>`).join('')}
@@ -108,7 +167,7 @@ app.get('/admin/dashboard', (req, res) => {
 
                 <h3 style="margin-top: 20px; color: #2563eb;">المتاجر المسجلة (${stores.length}):</h3>
                 <ul>
-                    ${stores.map(s => `<li>${s.storeName} (${s.storeSlug}) - المالك: ${s.ownerName}</li>`).join('')}
+                    ${stores.map(s => `<li><b>${s.storeName}</b> (${s.storeSlug}) - المالك: ${s.ownerName}</li>`).join('')}
                 </ul>
             </div>
         </body>
