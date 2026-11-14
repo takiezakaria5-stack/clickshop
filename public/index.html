@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', sans-serif; }
         body { background: #f3f4f6; color: #1f2937; text-align: center; }
         
-        /* الهيدر: قابل للنقر 3 مرات خفية لدخول لوحة التحكم */
+        /* الهيدر: انقر عليه 3 مرات لفتح نافذة كلمة المرور */
         header { background: #008060; color: white; padding: 25px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 15px; cursor: pointer; user-select: none; }
         .logo-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
         header h1 { font-size: 28px; font-weight: bold; }
@@ -22,7 +22,7 @@
         .btn { background: #008060; color: white; border: none; padding: 14px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.3s; }
         .btn:hover { background: #006e52; }
 
-        /* مكان الإعلانات */
+        /* مكان الإعلانات (يمكنك وضع صور أو نصوص إعلانية هنا) */
         .ads-banner { background: #fef3c7; border: 2px dashed #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px; color: #92400e; font-weight: bold; }
 
         /* قسم وسائل التواصل الاجتماعي والواتساب */
@@ -46,8 +46,9 @@
 </head>
 <body>
 
-    <!-- الهيدر: انقر عليه 3 مرات متتالية لفتح لوحة التحكم مباشرة بدون كلمة سر -->
+    <!-- الهيدر: صورة شعارك + اسم ClickShop (انقر 3 مرات لفتح لوحة التحكم بكلمة سر kenouni19) -->
     <header onclick="handleAdminTrigger()">
+        <!-- استبدل رابط الصورة هنا برابط شعارك الخاص -->
         <img src="https://i.ibb.co/6P82W8h/default-avatar.png" alt="Logo" class="logo-img">
         <h1>ClickShop</h1>
     </header>
@@ -55,7 +56,7 @@
     <div class="container">
         <!-- مكان الإعلانات -->
         <div class="ads-banner">
-            📢 مساحة إعلانية مخصصة (عروض وخصومات مميزة قريباً هنا)
+            📢 مكان مخصص للإعلانات والعروض الخاصة بك هنا
         </div>
 
         <!-- الصفحة الترحيبية -->
@@ -128,10 +129,11 @@
 
         <!-- قسم مواقع التواصل الاجتماعي والواتساب -->
         <div class="social-box">
-            <a href="https://wa.me/213000000000" target="_blank" class="social-btn whatsapp" title="تواصل عبر الواتساب"><i class="fa-brands fa-whatsapp"></i></a>
-            <a href="https://instagram.com" target="_blank" class="social-btn instagram" title="إنستغرام"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://facebook.com" target="_blank" class="social-btn facebook" title="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="https://t.me" target="_blank" class="social-btn telegram" title="تلغرام"><i class="fa-brands fa-telegram"></i></a>
+            <!-- استبدل الأرقام برقم هاتفك للواتساب -->
+            <a href="https://wa.me/213700000000" target="_blank" class="social-btn whatsapp" title="تواصل عبر الواتساب"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://instagram.com/your-account" target="_blank" class="social-btn instagram" title="إنستغرام"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://facebook.com/your-account" target="_blank" class="social-btn facebook" title="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://t.me/your-account" target="_blank" class="social-btn telegram" title="تلغرام"><i class="fa-brands fa-telegram"></i></a>
         </div>
     </div>
 
@@ -141,7 +143,7 @@
             document.getElementById('registerSection').style.display = 'block';
         }
 
-        // خاصية النقر 3 مرات على الهيدر لفتح لوحة التحكم مباشرة
+        // خاصية النقر 3 مرات لإدخال كلمة السر kenouni19 والدخول للوحة التحكم
         let clickCount = 0;
         let clickTimer = null;
 
@@ -152,8 +154,21 @@
             } else if (clickCount === 3) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
-                // الانتقال المباشر للوحة التحكم بدون كلمة سر
-                window.location.href = '/admin/dashboard';
+                let pwd = prompt("أدخل كلمة مرور المدير (Admin Password):");
+                if (pwd) {
+                    fetch('/admin/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: pwd })
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            window.location.href = '/admin/dashboard';
+                        } else {
+                            alert('كلمة المرور خاطئة!');
+                        }
+                    });
+                }
             }
         }
 
