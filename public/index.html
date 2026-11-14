@@ -23,10 +23,10 @@
 <div class="container">
     <h2>بيانات متجرك الجديد</h2>
 
-    <!-- عداد التنازلي للتفعيل -->
+    <!-- عداد التنازلي للتفعيل (75 ثانية) -->
     <div class="activation-timer-box">
         <span style="font-size: 14px; color: #008060; font-weight: bold;">الوقت المتبقي لإدخال كود التفعيل:</span>
-        <div id="countdown" style="font-size: 20px; color: #dc2626; font-weight: bold; margin-top: 5px;">10:00</div>
+        <div id="countdown" style="font-size: 20px; color: #dc2626; font-weight: bold; margin-top: 5px;">01:15</div>
     </div>
 
     <form action="/register" method="POST">
@@ -56,6 +56,17 @@
             </select>
         </div>
 
+        <!-- خيار اختيار اللون -->
+        <div class="form-group">
+            <label for="storeColor">لون الهوية البصرية للمتجر</label>
+            <select id="storeColor" name="storeColor" style="border: 2px solid #008060;">
+                <option value="emerald-green">أخضر زمردي (افتراضي)</option>
+                <option value="royal-blue">أزرق ملكي</option>
+                <option value="luxury-gold">ذهبي فاخر</option>
+                <option value="burgundy-red">عنابي داكن</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label for="ownerName">اسم صاحب المتجر</label>
             <input type="text" id="ownerName" name="ownerName" placeholder="الاسم الكامل" required>
@@ -70,9 +81,9 @@
     </form>
 </div>
 
-<!-- سكربت العداد التنازلي -->
+<!-- سكربت العداد التنازلي (75 ثانية) -->
 <script>
-let timeLeft = 600; // 10 دقائق
+let timeLeft = 75; 
 const countdownElement = document.getElementById('countdown');
 
 const timer = setInterval(() => {
