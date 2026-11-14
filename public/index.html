@@ -1,205 +1,165 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" id="htmlRoot">
+<html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">إنشاء متجر جديد - ClickShop</title>
+    <title>ClickShop - أنشئ متجرك الإلكتروني بسهولة</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, Arial, sans-serif; }
-        body { background-color: #f3f4f6; color: #202223; line-height: 1.6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); width: 100%; max-width: 480px; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        h2 { color: #008060; font-size: 22px; text-align: center; flex-grow: 1; }
-        .lang-select { padding: 6px 10px; border: 2px solid #008060; border-radius: 6px; background: #fff; font-size: 13px; font-weight: bold; cursor: pointer; outline: none; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; color: #374151; font-weight: 600; font-size: 14px; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; font-size: 14px; transition: border-color 0.3s; }
-        input:focus, select:focus { border-color: #008060; }
-        .submit-btn { width: 100%; background: #008060; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        .submit-btn:hover { background: #006e52; }
-        .activation-timer-box { background: #f0fdf4; border: 1px solid #008060; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', sans-serif; }
+        body { background: #f3f4f6; color: #1f2937; text-align: center; }
+        
+        /* الهيدر الرئيسي مع خاصية النقر 3 مرات للمدير */
+        header { background: #008060; color: white; padding: 40px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; user-select: none; }
+        header h1 { font-size: 32px; margin-bottom: 10px; }
+        header p { font-size: 16px; opacity: 0.9; }
+
+        .container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .hero-title { font-size: 24px; color: #111827; margin-bottom: 20px; font-weight: bold; }
+        .hero-desc { font-size: 16px; color: #4b5563; line-height: 1.8; margin-bottom: 30px; }
+
+        .btn { background: #008060; color: white; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.3s; }
+        .btn:hover { background: #006e52; }
+
+        /* قسم نموذج التسجيل (يظهر عند الضغط على ابدأ الآن) */
+        #registerSection { display: none; margin-top: 30px; text-align: right; border-top: 2px solid #e5e7eb; padding-top: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #374151; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; }
+        
+        .timer-box { background: #f0fdf4; border: 1px dashed #008060; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; }
+        .timer { font-size: 22px; color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="top-bar">
-        <h2 data-i18n="formTitle">بيانات متجرك الجديد</h2>
-        <!-- خيار اختيار اللغة -->
-        <select id="langSwitcher" class="lang-select" onchange="changeLanguage(this.value)">
-            <option value="ar">العربية</option>
-            <option value="fr">Français</option>
-            <option value="en">English</option>
-        </select>
+    <!-- الهيدر: انقر عليه 3 مرات متتالية لفتح لوحة التحكم -->
+    <header onclick="handleAdminTrigger()">
+        <h1>🛒 ClickShop Platform</h1>
+        <p>المنصة الاحترافية لإنشاء المتاجر الإلكترونية بكل سهولة</p>
+    </header>
+
+    <div class="container">
+        <!-- الصفحة الترحيبية -->
+        <div id="homePage">
+            <h2 class="hero-title">مرحباً بك في مستقبل التجارة الإلكترونية</h2>
+            <p class="hero-desc">
+                أطلق متجرك الخاص خلال ثوانٍ معدودة، بتحكم كامل في الهوية البصرية، الألوان، الأقسام، 
+                وبأمان تام عبر نظام أكواد التفعيل الحصرية. ابدأ تجارتك اليوم ولا تهدر الوقت!
+            </p>
+            <button class="btn" onclick="showRegisterForm()">ابدأ إنشاء متجرك الآن 🚀</button>
+        </div>
+
+        <!-- واجهة التسجيل (تفتح عند الضغط على الزر) -->
+        <div id="registerSection">
+            <h3 style="text-align: center; color: #008060; margin-bottom: 20px;">نموذج تسجيل المتجر الجديد</h3>
+            
+            <div class="timer-box">
+                <p>الوقت المتبقي لإدخال كود التفعيل:</p>
+                <div class="timer" id="countdown">01:15</div>
+            </div>
+
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label>كود التفعيل (من المشرف):</label>
+                    <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required>
+                </div>
+
+                <div class="form-group">
+                    <label>اسم المتجر:</label>
+                    <input type="text" name="storeName" placeholder="أدخل اسم متجرك" required>
+                </div>
+
+                <div class="form-group">
+                    <label>رابط المتجر بالإنجليزية (Slug):</label>
+                    <input type="text" name="storeSlug" placeholder="store-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>مجال التجارة:</label>
+                    <select name="storeCategory">
+                        <option>ملابس وأزياء</option>
+                        <option>إلكترونيات وتكنولوجيا</option>
+                        <option>مستحضرات تجميل وعناية</option>
+                        <option>أغذية ومواد عامة</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>لون الهوية البصرية للمتجر:</label>
+                    <select name="storeColor">
+                        <option>أخضر زمردي / Emerald Green</option>
+                        <option>أسود ملكي / Royal Black</option>
+                        <option>أزرق داكن / Navy Blue</option>
+                        <option>أحمر جريء / Bold Red</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>اسم صاحب المتجر:</label>
+                    <input type="text" name="ownerName" placeholder="اسمك الكامل" required>
+                </div>
+
+                <div class="form-group">
+                    <label>كلمة مرور لوحة تحكم متجرك:</label>
+                    <input type="password" name="password" placeholder="كلمة المرور الخاصة بمتجرك" required>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%;">إتمام وإنشاء المتجر 🎯</button>
+            </form>
+        </div>
     </div>
 
-    <!-- العداد التنازلي (75 ثانية) -->
-    <div class="activation-timer-box">
-        <span data-i18n="timerText" style="font-size: 13px; color: #008060; font-weight: bold;">الوقت المتبقي لإدخال كود التفعيل:</span>
-        <div id="countdown" style="font-size: 20px; color: #dc2626; font-weight: bold; margin-top: 5px;">01:15</div>
-    </div>
-
-    <form action="/register" method="POST">
-        
-        <!-- خانة كود التفعيل -->
-        <div class="form-group">
-            <label for="activationCode" data-i18n="lblActivation">كود التفعيل</label>
-            <input type="text" id="activationCode" name="activationCode" data-i18n-placeholder="phActivation" placeholder="أدخل كود التفعيل هنا" required style="border: 2px solid #008060;">
-        </div>
-
-        <div class="form-group">
-            <label for="storeName" data-i18n="lblStoreName">اسم المتجر</label>
-            <input type="text" id="storeName" name="storeName" data-i18n-placeholder="phStoreName" placeholder="أدخل اسم متجرك" required>
-        </div>
-
-        <div class="form-group">
-            <label for="storeSlug" data-i18n="lblSlug">رابط المتجر بالإنجليزية (Slug)</label>
-            <input type="text" id="storeSlug" name="storeSlug" placeholder="store-name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="storeCategory" data-i18n="lblCategory">مجال التجارة</label>
-            <select id="storeCategory" name="storeCategory">
-                <option value="clothing" data-i18n="optClothing">ملابس وأزياء</option>
-                <option value="electronics" data-i18n="optElectronics">إلكترونيات</option>
-                <option value="general" data-i18n="optGeneral">تجارة عامة</option>
-            </select>
-        </div>
-
-        <!-- 12 لوناً للهوية البصرية -->
-        <div class="form-group">
-            <label for="storeColor" data-i18n="lblColor">لون الهوية البصرية للمتجر (12 لوناً)</label>
-            <select id="storeColor" name="storeColor" style="border: 2px solid #008060;">
-                <option value="emerald-green">أخضر زمردي / Emerald Green</option>
-                <option value="royal-blue">أزرق ملكي / Royal Blue</option>
-                <option value="luxury-gold">ذهبي فاخر / Luxury Gold</option>
-                <option value="burgundy-red">عنابي داكن / Burgundy</option>
-                <option value="midnight-black">أسود فاحم / Midnight Black</option>
-                <option value="sunset-orange">برتقالي غروبي / Sunset Orange</option>
-                <option value="purple-orchid">أرجواني ملكي / Purple Orchid</option>
-                <option value="rose-pink">وردي عصري / Rose Pink</option>
-                <option value="slate-gray">رمادي فولاذي / Slate Gray</option>
-                <option value="teal-cyan">تركواز بحري / Teal Cyan</option>
-                <option value="chocolate-brown">بني شوكولاتة / Chocolate Brown</option>
-                <option value="ruby-red">أحمر روبي / Ruby Red</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="ownerName" data-i18n="lblOwner">اسم صاحب المتجر</label>
-            <input type="text" id="ownerName" name="ownerName" data-i18n-placeholder="phOwner" placeholder="الاسم الكامل" required>
-        </div>
-
-        <div class="form-group">
-            <label for="password" data-i18n="lblPassword">كلمة المرور لوحة التحكم</label>
-            <input type="password" id="password" name="password" placeholder="********" required>
-        </div>
-
-        <button type="submit" class="submit-btn" data-i18n="btnSubmit">إنشاء المتجر</button>
-    </form>
-</div>
-
-<!-- سكربت العداد ونظام اللغات -->
-<script>
-// العداد 75 ثانية
-let timeLeft = 75; 
-const countdownElement = document.getElementById('countdown');
-
-const timer = setInterval(() => {
-    let minutes = Math.floor(timeLeft / 60);
-    let seconds = timeLeft % 60;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
-    countdownElement.textContent = minutes + ':' + seconds;
-    if (timeLeft <= 0) {
-        clearInterval(timer);
-        countdownElement.textContent = "انتهى الوقت! / Time's up!";
-    } else {
-        timeLeft--;
-    }
-}, 1000);
-
-// قاموس الترجمات (عربي، فرنسي، إنجليزي)
-const translations = {
-    ar: {
-        pageTitle: "إنشاء متجر جديد - ClickShop",
-        formTitle: "بيانات متجرك الجديد",
-        timerText: "الوقت المتبقي لإدخال كود التفعيل:",
-        lblActivation: "كود التفعيل",
-        phActivation: "أدخل كود التفعيل هنا",
-        lblStoreName: "اسم المتجر",
-        phStoreName: "أدخل اسم متجرك",
-        lblSlug: "رابط المتجر بالإنجليزية (Slug)",
-        lblCategory: "مجال التجارة",
-        optClothing: "ملابس وأزياء",
-        optElectronics: "إلكترونيات",
-        optGeneral: "تجارة عامة",
-        lblColor: "لون الهوية البصرية للمتجر (12 لوناً)",
-        lblOwner: "اسم صاحب المتجر",
-        phOwner: "الاسم الكامل",
-        lblPassword: "كلمة المرور لوحة التحكم",
-        btnSubmit: "إنشاء المتجر"
-    },
-    fr: {
-        pageTitle: "Créer une nouvelle boutique - ClickShop",
-        formTitle: "Détails de votre boutique",
-        timerText: "Temps restant pour entrer le code d'activation :",
-        lblActivation: "Code d'activation",
-        phActivation: "Entrez le code d'activation ici",
-        lblStoreName: "Nom de la boutique",
-        phStoreName: "Entrez le nom de votre boutique",
-        lblSlug: "Lien de la boutique (Slug)",
-        lblCategory: "Catégorie d'activité",
-        optClothing: "Vêtements et Mode",
-        optElectronics: "Électronique",
-        optGeneral: "Commerce Général",
-        lblColor: "Couleur de la marque (12 couleurs)",
-        lblOwner: "Nom du propriétaire",
-        phOwner: "Nom complet",
-        lblPassword: "Mot de passe du panneau",
-        btnSubmit: "Créer la boutique"
-    },
-    en: {
-        pageTitle: "Create New Store - ClickShop",
-        formTitle: "Your New Store Details",
-        timerText: "Time remaining to enter activation code:",
-        lblActivation: "Activation Code",
-        phActivation: "Enter activation code here",
-        lblStoreName: "Store Name",
-        phStoreName: "Enter your store name",
-        lblSlug: "Store URL (Slug)",
-        lblCategory: "Store Category",
-        optClothing: "Clothing & Fashion",
-        optElectronics: "Electronics",
-        optGeneral: "General Merchandise",
-        lblColor: "Brand Color Theme (12 Colors)",
-        lblOwner: "Owner Name",
-        phOwner: "Full Name",
-        lblPassword: "Dashboard Password",
-        btnSubmit: "Create Store"
-    }
-};
-
-function changeLanguage(lang) {
-    const root = document.getElementById('htmlRoot');
-    root.setAttribute('lang', lang);
-    root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[lang][key]) {
-            el.textContent = translations[lang][key];
+    <script>
+        // إظهار نموذج التسجيل عند النقر
+        function showRegisterForm() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('registerSection').style.display = 'block';
         }
-    });
 
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[lang][key]) {
-            el.setAttribute('placeholder', translations[lang][key]);
+        // نظام النقر 3 مرات على الهيدر لفتح لوحة تحكم المدير
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function handleAdminTrigger() {
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+            } else if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+                let pwd = prompt("أدخل كلمة مرور المدير (Admin Password):");
+                if (pwd) {
+                    fetch('/admin/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: pwd })
+                    })
+                    .then(res => {
+                        if (res.ok) {
+                            window.location.href = '/admin/dashboard';
+                        } else {
+                            alert('كلمة المرور خاطئة!');
+                        }
+                    });
+                }
+            }
         }
-    });
-}
-</script>
 
+        // عداد الوقت التنازلي (75 ثانية)
+        let timeLeft = 75;
+        const timerElement = document.getElementById('countdown');
+        const timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                timerElement.innerText = "انتهى الوقت!";
+            } else {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+                timerElement.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                timeLeft--;
+            }
+        }, 1000);
+    </script>
 </body>
 </html>
