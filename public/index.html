@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClickShop | أنشئ متجرك الإلكتروني الاحترافي</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f6f6f7; color: #202223; line-height: 1.6; }
+        
+        /* Header */
+        header { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e3e5; }
+        .logo { font-size: 24px; font-weight: bold; color: #008060; letter-spacing: -0.5px; }
+        .nav-btn { background: #008060; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .nav-btn:hover { background: #006e52; }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #004c3f 0%, #008060 100%); color: white; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 15px; }
+        .hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px; opacity: 0.9; }
+        .cta-btn { background: #ffffff; color: #004c3f; padding: 15px 35px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* Form Container */
+        .container { max-width: 500px; margin: -40px auto 50px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); display: none; }
+        .container.active { display: block; }
+        .container h2 { margin-bottom: 20px; color: #004c3f; text-align: center; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #babfc3; border-radius: 6px; font-size: 15px; }
+        .form-group input:focus { outline: none; border-color: #008060; }
+
+        .submit-btn { width: 100%; background: #008060; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .submit-btn:hover { background: #006e52; }
+
+        /* Alert Message */
+        #message { margin-top: 15px; padding: 12px; border-radius: 6px; text-align: center; display: none; font-weight: bold; }
+        .success { background: #e3f1df; color: #004c3f; border: 1px solid #008060; }
+        .error { background: #fbeae5; color: #d82c0d; border: 1px solid #d82c0d; }
+
+        /* Features */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .feature-card { background: white; padding: 25px; border-radius: 8px; border: 1px solid #e1e3e5; text-align: center; }
+        .feature-card h3 { color: #008060; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ClickShop</div>
+        <button class="nav-btn" onclick="toggleForm()">أنشئ متجرك الآن</button>
+    </header>
+
+    <section class="hero">
+        <h1>أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
+        <p>منصة ClickShop تمنحك كل الأدوات اللازمة لإدارة منتجاتك، استقبال طلباتك، وتوسيع تجارتك بكل سهولة واحترافية.</p>
+        <button class="cta-btn" onclick="toggleForm()">ابدأ متجرك الآن</button>
+    </section>
+
+    <!-- نموذج إنشاء المتجر -->
+    <div class="container" id="storeFormContainer">
+        <h2>بيانات متجرك الجديد</h2>
+        <form id="createStoreForm">
+            <div class="form-group">
+                <label>اسم المتجر (مثال: ZASO Store)</label>
+                <input type="text" id="storeName" required placeholder="أدخل اسم متجرك">
+            </div>
+            <div class="form-group">
+                <label>رابط المتجر بالانجليزية (مثال: zaso)</label>
+                <input type="text" id="domainSlug" required placeholder="store-name">
+            </div>
+            <div class="form-group">
+                <label>مجال التجارة</label>
+                <select id="category">
+                    <option value="Clothing & Fashion">ملابس وأزياء</option>
+                    <option value="Electronics">إلكترونيات</option>
+                    <option value="Handmade & Crafts">صناعات يدوية وحرف</option>
+                    <option value="General Store">متجر عام</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>اسم صاحب المتجر</label>
+                <input type="text" id="ownerName" required placeholder="الاسم الكامل">
+            </div>
+            <div class="form-group">
+                <label>كلمة المرور للوحة التحكم</label>
+                <input type="password" id="password" required placeholder="********">
+            </div>
+            <button type="submit" class="submit-btn">إنشاء المتجر</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <section class="features">
+        <div class="feature-card">
+            <h3>سرعة وأداء عالي</h3>
+            <p>بنية سحابية متطورة تضمن عمل متجرك بدون توقف وبسرعة فائقة لزبائنك.</p>
+        </div>
+        <div class="feature-card">
+            <h3>رابط خاص لمتجرك</h3>
+            <p>احصل على رابط مباشر لمتجرك لمشاركته على مواقع التواصل الاجتماعي واستقبال الطلبات.</p>
+        </div>
+        <div class="feature-card">
+            <h3>إدارة متكاملة</h3>
+            <p>تحكم كامل في إضافة المنتجات، تعديل الأسعار، ومتابعة المخزون من مكان واحد.</p>
+        </div>
+    </section>
+
+    <script>
+        function toggleForm() {
+            const container = document.getElementById('storeFormContainer');
+            container.classList.add('active');
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.getElementById('createStoreForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msgBox = document.getElementById('message');
+            msgBox.style.display = 'none';
+
+            const data = {
+                storeName: document.getElementById('storeName').value,
+                domainSlug: document.getElementById('domainSlug').value.toLowerCase().trim(),
+                category: document.getElementById('category').value,
+                ownerName: document.getElementById('ownerName').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/api/stores/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    msgBox.className = 'success';
+                    msgBox.innerHTML = `تم إنشاء متجر "${result.store.storeName}" بنجاح!<br>رابط متجرك: /store/${result.store.domainSlug}`;
+                    msgBox.style.display = 'block';
+                    document.getElementById('createStoreForm').reset();
+                } else {
+                    msgBox.className = 'error';
+                    msgBox.textContent = result.error || 'حدث خطأ أثناء إنشاء المتجر';
+                    msgBox.style.display = 'block';
+                }
+            } catch (err) {
+                msgBox.className = 'error';
+                msgBox.textContent = 'تعذر الاتصال بالسيرفر';
+                msgBox.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

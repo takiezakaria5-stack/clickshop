@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء متجر جديد | ClickShop</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #f6f6f7; color: #202223; padding: 20px; }
+        .box { max-width: 500px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.06); }
+        h2 { color: #004c3f; margin-bottom: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #babfc3; border-radius: 6px; font-size: 15px; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: #008060; box-shadow: 0 0 0 2px rgba(0,128,96,0.1); }
+        button { width: 100%; background: #008060; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #006e52; }
+        .alert { margin-top: 15px; padding: 12px; border-radius: 6px; text-align: center; display: none; font-weight: bold; font-size: 14px; }
+        .success { background: #e3f1df; color: #004c3f; }
+        .error { background: #fbeae5; color: #d82c0d; display: block; }
+        .store-link { display: block; text-align: center; margin-top: 15px; color: #008060; font-weight: bold; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>إنشاء متجر جديد في ClickShop</h2>
+        <form id="registerForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>اسم المتجر</label>
+                <input type="text" id="storeName" required placeholder="مثال: زكرياء إكسبريس">
+            </div>
+            <div class="form-group">
+                <label>رابط المتجر (Slug بالإنجليزية بدون مسافات)</label>
+                <input type="text" id="domainSlug" required placeholder="zexpress">
+            </div>
+            <div class="form-group">
+                <label>التصنيف التجاري</label>
+                <select id="category">
+                    <option value="General Store">متجر عام (General Store)</option>
+                    <option value="Fashion & Clothes">ملابس وأزياء</option>
+                    <option value="Electronics">إلكترونيات</option>
+                    <option value="Cosmetics">تجميل وعطور</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>اسم المالك</label>
+                <input type="text" id="ownerName" required placeholder="اسمك الكامل">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف</label>
+                <input type="text" id="phone" required placeholder="06XXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label>كلمة مرور لوحة التحكم</label>
+                <input type="password" id="password" required placeholder="********">
+            </div>
+            <div class="form-group">
+                <label>شعار المتجر (Logo)</label>
+                <input type="file" id="storeLogo" accept="image/*">
+            </div>
+            <div class="form-group" style="background: #eefcf6; padding: 12px; border-radius: 6px; border: 1px dashed #008060;">
+                <label style="color: #004c3f;">كود التفعيل (صالح لـ 50 ثانية فقط)</label>
+                <input type="text" id="licenseKey" required placeholder="CLICK-XXXX-XXXX" style="background: #fff; text-transform: uppercase;">
+            </div>
+            <button type="submit">إتمام إنشاء المتجر</button>
+        </form>
+        <div id="alertBox" class="alert"></div>
+        <div id="successArea" style="display: none; text-align: center; margin-top: 15px;">
+            <a id="visitLink" href="#" target="_blank" class="store-link" style="font-size: 1.1rem;">زيارة المتجر الآن ↗</a>
+            <a href="/panel.html" class="store-link" style="color: #202223; margin-top: 5px;">الذهاب لوحة التحكم ⚙️</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('alertBox');
+            alertBox.style.display = 'none';
+            alertBox.className = 'alert';
+
+            const formData = new FormData();
+            formData.append('storeName', document.getElementById('storeName').value);
+            formData.append('domainSlug', document.getElementById('domainSlug').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('ownerName', document.getElementById('ownerName').value);
+            formData.append('phone', document.getElementById('phone').value);
+            formData.append('password', document.getElementById('password').value);
+            formData.append('licenseKey', document.getElementById('licenseKey').value);
+
+            const logoFile = document.getElementById('storeLogo').files[0];
+            if (logoFile) {
+                formData.append('storeLogo', logoFile);
+            }
+
+            try {
+                const res = await fetch('/api/stores/create', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alertBox.className = 'alert success';
+                    alertBox.textContent = 'تم إنشاء المتجر بنجاح وتم إرسال الإشعار لغرفة العمليات!';
+                    alertBox.style.display = 'block';
+                    document.getElementById('registerForm').style.display = 'none';
+                    
+                    const slug = document.getElementById('domainSlug').value.toLowerCase().trim();
+                    document.getElementById('visitLink').href = `/store/${slug}`;
+                    document.getElementById('successArea').style.display = 'block';
+                } else {
+                    alertBox.className = 'alert error';
+                    // تخصيص رسالة واضحة إذا كان رقم الهاتف مسجلاً مسبقاً
+                    if (data.error && data.error.includes('رقم الهاتف')) {
+                        alertBox.textContent = '⚠️ تنبيه: رقم الهاتف هذا مسجل مسبقاً في متجر آخر ولا يمكن إعادة استخدامه!';
+                    } else {
+                        alertBox.textContent = data.error || 'حدث خطأ أثناء الإنشاء';
+                    }
+                    alertBox.style.display = 'block';
+                }
+            } catch (err) {
+                alertBox.className = 'alert error';
+                alertBox.textContent = 'تعذر الاتصال بالسيرفر';
+                alertBox.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

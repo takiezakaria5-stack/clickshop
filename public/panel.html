@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم المركزية | ClickShop Admin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #f6f6f7; color: #202223; padding: 20px; }
+        .container { max-width: 800px; margin: 20px auto; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2, h3 { color: #004c3f; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #babfc3; border-radius: 6px; font-size: 15px; background: #fff; }
+        input:focus, select:focus { outline: none; border-color: #008060; box-shadow: 0 0 0 2px rgba(0,128,96,0.1); }
+        button { background: #008060; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #006e52; }
+        .code-box { background: #eefcf6; border: 2px dashed #008060; padding: 20px; text-align: center; border-radius: 8px; margin-top: 15px; display: none; }
+        .code-display { font-size: 1.8rem; font-weight: bold; color: #004c3f; margin: 10px 0; letter-spacing: 2px; }
+        .alert { margin-top: 10px; padding: 10px; border-radius: 6px; text-align: center; display: none; font-weight: bold; font-size: 14px; }
+        .success { background: #e3f1df; color: #004c3f; display: block; }
+        .error { background: #fbeae5; color: #d82c0d; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- رأس الصفحة -->
+        <div class="card" style="text-align: center; background: linear-gradient(135deg, #004c3f, #008060); color: white;">
+            <h2 style="color: white; margin-bottom: 5px;">لوحة تحكم منصة ClickShop</h2>
+            <p>إدارة التراخيص، إعدادات المنصة، والإعلانات المركزية</p>
+        </div>
+
+        <!-- قسم توليد الأكواد الفوري -->
+        <div class="card">
+            <h3>🔑 توليد كود تفعيل تاجر جديد</h3>
+            <p style="color: #6d7175; margin-bottom: 15px; font-size: 14px;">اضغط على الزر أدناه لتوليد كود تفعيل حصري صالح لمدة 75 ثانية فقط.</p>
+            <button onclick="generateKey()">توليد كود جديد الآن</button>
+            
+            <div id="codeResultBox" class="code-box">
+                <p style="font-size: 14px; color: #008060;">الكود المُولّد (صالح لـ 75 ثانية):</p>
+                <div id="generatedCode" class="code-display"></div>
+                <p id="timerText" style="font-size: 13px; color: #d82c0d; font-weight: bold;"></p>
+            </div>
+        </div>
+
+        <!-- قسم إعدادات المنصة والشعار -->
+        <div class="card">
+            <h3>⚙️ إعدادات المنصة والهوية</h3>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>رابط فيسبوك الرسمي للمنصة</label>
+                    <input type="url" id="platformFb" placeholder="https://facebook.com/...">
+                </div>
+                <div class="form-group">
+                    <label>رابط إنستغرام الرسمي</label>
+                    <input type="url" id="platformIg" placeholder="https://instagram.com/...">
+                </div>
+                <div class="form-group">
+                    <label>رقم الدعم الفني / المراسلة</label>
+                    <input type="text" id="platformPhone" placeholder="06XXXXXXXX">
+                </div>
+                <button type="submit">حفظ الإعدادات العامة</button>
+            </form>
+            <div id="settingsAlert" class="alert"></div>
+        </div>
+
+        <!-- قسم إدارة الإعلانات واللافتات (Banner/Ads) -->
+        <div class="card" style="border: 2px solid #ffab00;">
+            <h3 style="color: #b25e00;">📢 إدارة الإعلانات التجارية (Ads Banner)</h3>
+            <p style="color: #6d7175; margin-bottom: 15px; font-size: 14px;">تحكم في الإعلانات المعروضة لتحقيق أرباح إضافية للمنصة.</p>
+            <form id="adsForm">
+                <div class="form-group">
+                    <label>نص الإعلان أو العرض</label>
+                    <input type="text" id="adText" placeholder="مثال: احصل على خصم 50% على تصميم المتاجر هذا الأسبوع!">
+                </div>
+                <div class="form-group">
+                    <label>رابط وجهة الإعلان</label>
+                    <input type="url" id="adLink" placeholder="https://...">
+                </div>
+                <button type="submit" style="background: #ffab00; color: #202223;">تحديث الإعلان النشط</button>
+            </form>
+            <div id="adsAlert" class="alert"></div>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval;
+
+        // دالة توليد الكود من لوحة التحكم
+        async function generateKey() {
+            try {
+                const res = await fetch('/api/admin/generate-key', { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok) {
+                    const box = document.getElementById('codeResultBox');
+                    const codeEl = document.getElementById('generatedCode');
+                    const timerEl = document.getElementById('timerText');
+                    
+                    codeEl.textContent = data.code;
+                    box.style.display = 'block';
+
+                    // عد تنازلي لـ 75 ثانية
+                    let timeLeft = 75;
+                    if (countdownInterval) clearInterval(countdownInterval);
+
+                    countdownInterval = setInterval(() => {
+                        timeLeft--;
+                        timerEl.textContent = `تنتهي صلاحية هذا الكود خلال: ${timeLeft} ثانية`;
+                        if (timeLeft <= 0) {
+                            clearInterval(countdownInterval);
+                            timerEl.textContent = '❌ انتهت صلاحية هذا الكود!';
+                            codeEl.style.color = '#8c9196';
+                        } else {
+                            codeEl.style.color = '#004c3f';
+                        }
+                    }, 1000);
+                } else {
+                    alert('خطأ في توليد الكود');
+                }
+            } catch (err) {
+                alert('تعذر الاتصال بالسيرفر');
+            }
+        }
+
+        // حفظ إعدادات المنصة
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('settingsAlert');
+            alertBox.className = 'alert success';
+            alertBox.textContent = 'تم حفظ الإعدادات العامة بنجاح!';
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        });
+
+        // حفظ الإعلانات
+        document.getElementById('adsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('adsAlert');
+            alertBox.className = 'alert success';
+            alertBox.textContent = 'تم تحديث الإعلان ونشره في المنصة بنجاح!';
+            alertBox.style.display = 'block';
+            setTimeout(() => { alertBox.style.display = 'none'; }, 3000);
+        });
+    </script>
+</body>
+</html>
