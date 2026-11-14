@@ -3,56 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClickShop - أنشئ متجرك الإلكتروني بسهولة</title>
+    <title>ClickShop</title>
+    <!-- استدعاء مكتبة أيقونات FontAwesome للواتساب والسوشيال ميديا -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tahoma', sans-serif; }
         body { background: #f3f4f6; color: #1f2937; text-align: center; }
         
-        /* الهيدر الرئيسي مع خاصية النقر 3 مرات للمدير */
-        header { background: #008060; color: white; padding: 40px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; user-select: none; }
-        header h1 { font-size: 32px; margin-bottom: 10px; }
-        header p { font-size: 16px; opacity: 0.9; }
+        /* الهيدر الجديد: شعار + صورة بجانبه */
+        header { background: #008060; color: white; padding: 25px 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .logo-img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+        header h1 { font-size: 28px; font-weight: bold; }
 
-        .container { max-width: 800px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .container { max-width: 800px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         
-        .hero-title { font-size: 24px; color: #111827; margin-bottom: 20px; font-weight: bold; }
-        .hero-desc { font-size: 16px; color: #4b5563; line-height: 1.8; margin-bottom: 30px; }
+        .hero-title { font-size: 22px; color: #111827; margin-bottom: 15px; font-weight: bold; }
+        .hero-desc { font-size: 15px; color: #4b5563; line-height: 1.8; margin-bottom: 25px; }
 
-        .btn { background: #008060; color: white; border: none; padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.3s; }
+        .btn { background: #008060; color: white; border: none; padding: 14px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.3s; }
         .btn:hover { background: #006e52; }
 
-        /* قسم نموذج التسجيل (يظهر عند الضغط على ابدأ الآن) */
-        #registerSection { display: none; margin-top: 30px; text-align: right; border-top: 2px solid #e5e7eb; padding-top: 30px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #374151; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; }
+        /* مكان الإعلانات */
+        .ads-banner { background: #fef3c7; border: 2px dashed #f59e0b; padding: 20px; border-radius: 8px; margin-bottom: 25px; color: #92400e; font-weight: bold; }
+
+        /* قسم وسائل التواصل الاجتماعي والواتساب */
+        .social-box { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: center; gap: 20px; }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 20px; text-decoration: none; transition: transform 0.2s; }
+        .social-btn:hover { transform: scale(1.1); }
+        .whatsapp { background: #25d366; }
+        .instagram { background: #e1306c; }
+        .facebook { background: #1877f2; }
+        .telegram { background: #0088cc; }
+
+        /* نموذج التسجيل */
+        #registerSection { display: none; margin-top: 25px; text-align: right; border-top: 2px solid #e5e7eb; padding-top: 25px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #374151; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; }
         
-        .timer-box { background: #f0fdf4; border: 1px dashed #008060; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center; }
-        .timer { font-size: 22px; color: #dc2626; font-weight: bold; }
+        .timer-box { background: #f0fdf4; border: 1px dashed #008060; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center; }
+        .timer { font-size: 20px; color: #dc2626; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- الهيدر: انقر عليه 3 مرات متتالية لفتح لوحة التحكم -->
-    <header onclick="handleAdminTrigger()">
-        <h1>🛒 ClickShop Platform</h1>
-        <p>المنصة الاحترافية لإنشاء المتاجر الإلكترونية بكل سهولة</p>
+    <!-- الهيدر: صورة + ClickShop فقط -->
+    <header>
+        <img src="https://i.ibb.co/6P82W8h/default-avatar.png" alt="Logo" class="logo-img" id="shopLogo">
+        <h1>ClickShop</h1>
     </header>
 
     <div class="container">
+        <!-- مكان الإعلانات (يمكنك تغيير محتواه لاحقاً) -->
+        <div class="ads-banner">
+            📢 مساحة إعلانية مخصصة (عروض وخصومات مميزة قريباً هنا)
+        </div>
+
         <!-- الصفحة الترحيبية -->
         <div id="homePage">
-            <h2 class="hero-title">مرحباً بك في مستقبل التجارة الإلكترونية</h2>
+            <h2 class="hero-title">أنشئ متجرك الإلكتروني الاحترافي في ثوانٍ</h2>
             <p class="hero-desc">
-                أطلق متجرك الخاص خلال ثوانٍ معدودة، بتحكم كامل في الهوية البصرية، الألوان، الأقسام، 
-                وبأمان تام عبر نظام أكواد التفعيل الحصرية. ابدأ تجارتك اليوم ولا تهدر الوقت!
+                منصة متكاملة لإطلاق تجارتك الذكية، بتحكم كامل في الهوية، الألوان، وبأمان تام عبر أكواد التفعيل الحصرية.
             </p>
             <button class="btn" onclick="showRegisterForm()">ابدأ إنشاء متجرك الآن 🚀</button>
         </div>
 
-        <!-- واجهة التسجيل (تفتح عند الضغط على الزر) -->
+        <!-- واجهة التسجيل -->
         <div id="registerSection">
-            <h3 style="text-align: center; color: #008060; margin-bottom: 20px;">نموذج تسجيل المتجر الجديد</h3>
+            <h3 style="text-align: center; color: #008060; margin-bottom: 15px;">نموذج تسجيل المتجر الجديد</h3>
             
             <div class="timer-box">
                 <p>الوقت المتبقي لإدخال كود التفعيل:</p>
@@ -61,7 +79,7 @@
 
             <form action="/register" method="POST">
                 <div class="form-group">
-                    <label>كود التفعيل (من المشرف):</label>
+                    <label>كود التفعيل:</label>
                     <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required>
                 </div>
 
@@ -86,7 +104,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>لون الهوية البصرية للمتجر:</label>
+                    <label>لون الهوية البصرية:</label>
                     <select name="storeColor">
                         <option>أخضر زمردي / Emerald Green</option>
                         <option>أسود ملكي / Royal Black</option>
@@ -108,45 +126,23 @@
                 <button type="submit" class="btn" style="width: 100%;">إتمام وإنشاء المتجر 🎯</button>
             </form>
         </div>
+
+        <!-- قسم مواقع التواصل الاجتماعي والواتساب بأيقونات احترافية -->
+        <div class="social-box">
+            <a href="https://wa.me/213000000000" target="_blank" class="social-btn whatsapp" title="تواصل عبر الواتساب"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://instagram.com" target="_blank" class="social-btn instagram" title="إنستغرام"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://facebook.com" target="_blank" class="social-btn facebook" title="فيسبوك"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://t.me" target="_blank" class="social-btn telegram" title="تلغرام"><i class="fa-brands fa-telegram"></i></a>
+        </div>
     </div>
 
     <script>
-        // إظهار نموذج التسجيل عند النقر
         function showRegisterForm() {
             document.getElementById('homePage').style.display = 'none';
             document.getElementById('registerSection').style.display = 'block';
         }
 
-        // نظام النقر 3 مرات على الهيدر لفتح لوحة تحكم المدير
-        let clickCount = 0;
-        let clickTimer = null;
-
-        function handleAdminTrigger() {
-            clickCount++;
-            if (clickCount === 1) {
-                clickTimer = setTimeout(() => { clickCount = 0; }, 600);
-            } else if (clickCount === 3) {
-                clearTimeout(clickTimer);
-                clickCount = 0;
-                let pwd = prompt("أدخل كلمة مرور المدير (Admin Password):");
-                if (pwd) {
-                    fetch('/admin/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: pwd })
-                    })
-                    .then(res => {
-                        if (res.ok) {
-                            window.location.href = '/admin/dashboard';
-                        } else {
-                            alert('كلمة المرور خاطئة!');
-                        }
-                    });
-                }
-            }
-        }
-
-        // عداد الوقت التنازلي (75 ثانية)
+        // عداد الوقت التنازلي
         let timeLeft = 75;
         const timerElement = document.getElementById('countdown');
         const timerInterval = setInterval(() => {
