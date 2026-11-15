@@ -65,19 +65,16 @@ async function sendTelegramNotification(chatId, message) {
 
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة"];
 
+// ألوان الأولد موني (Old Money) الراقية والهادئة من كلمة واحدة
 const storeColors = [
-    { name: "أخضر زمردي", code: "#008060" },
-    { name: "أزرق ملكي", code: "#2563eb" },
-    { name: "أحمر داكن", code: "#dc2626" },
-    { name: "أسود أنيق", code: "#1f2937" },
-    { name: "بنفسجي", code: "#7c3aed" },
-    { name: "برتقالي", code: "#ea580c" },
-    { name: "وردي فوشيا", code: "#db2777" },
-    { name: "تركواز بحري", code: "#0d9488" },
-    { name: "رمادي معدني", code: "#4b5563" },
-    { name: "ذهبي فخم", code: "#d97706" },
-    { name: "أزرق سماوي", code: "#0284c7" },
-    { name: "أخضر زيتوني", code: "#4d7c0f" }
+    { name: "كشميري", code: "#d4b996" },
+    { name: "زيتوني", code: "#4a5d4e" },
+    { name: "كحلي", code: "#1b2a4a" },
+    { name: "شوكولاتي", code: "#3d2314" },
+    { name: "فحمي", code: "#2b2b2b" },
+    { name: "كريمي", code: "#f5f2eb" },
+    { name: "رمادي", code: "#7d8491" },
+    { name: "تبغي", code: "#8c6239" }
 ];
 
 function renderLayout(title, content, extraHead = '') {
@@ -91,27 +88,27 @@ function renderLayout(title, content, extraHead = '') {
         <style>
             * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
             body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
-            .navbar { background: #008060; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; width: 100%; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            .navbar { background: #1b2a4a; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; width: 100%; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
             .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: #fff; }
             .brand h1 { margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
-            .logo-circle { background: #fff; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 11px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+            .logo-circle { background: #fff; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1b2a4a; font-weight: bold; font-size: 11px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
             
             .lang-dropdown { position: relative; display: inline-block; }
             .lang-main-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
             .lang-content { display: none; position: absolute; left: 0; background-color: #fff; min-width: 100px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); border-radius: 6px; z-index: 1; overflow: hidden; }
             .lang-content button { color: #111827; padding: 8px 12px; text-decoration: none; display: block; border: none; background: none; width: 100%; text-align: right; font-size: 12px; cursor: pointer; font-weight: bold; }
-            .lang-content button:hover { background-color: #f3f4f6; color: #008060; }
+            .lang-content button:hover { background-color: #f3f4f6; color: #1b2a4a; }
             .lang-dropdown:hover .lang-content { display: block; }
 
-            .hero-section { background: linear-gradient(135deg, #008060 0%, #046c51 100%); color: #fff; padding: 30px 15px; text-align: center; width: 100%; }
+            .hero-section { background: linear-gradient(135deg, #1b2a4a 0%, #2b3a5a 100%); color: #fff; padding: 30px 15px; text-align: center; width: 100%; }
             .card-box { background: #fff; margin: -20px 12px 15px 12px; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); color: #111827; text-align: right; }
-            .announcement-box { border: 2px dashed #f59e0b; background: #fffbeb; padding: 12px; border-radius: 10px; margin-bottom: 18px; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+            .announcement-box { border: 2px dashed #d4b996; background: #fdfbf7; padding: 12px; border-radius: 10px; margin-bottom: 18px; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
             .btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; text-align: center; }
-            .btn-green { background: #008060; color: #fff; }
-            .btn-blue { background: #2563eb; color: #fff; }
+            .btn-green { background: #1b2a4a; color: #fff; }
+            .btn-blue { background: #3d2314; color: #fff; }
             label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #374151; }
             input, select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
-            input:focus, select:focus, textarea:focus { outline: none; border-color: #008060; }
+            input:focus, select:focus, textarea:focus { outline: none; border-color: #1b2a4a; }
         </style>
         ${extraHead}
     </head>
@@ -169,7 +166,7 @@ app.get('/', (req, res) => {
     if (db.siteSettings.announcementType === 'image' && db.siteSettings.announcementImage) {
         announcementHTML = `<img src="${db.siteSettings.announcementImage}" style="width:100%; max-height:180px; object-fit:cover; border-radius:8px;">`;
     } else {
-        announcementHTML = `<span style="color:#b45309; font-size:14px; font-weight:bold;">${db.siteSettings.announcementText}</span>`;
+        announcementHTML = `<span style="color:#3d2314; font-size:14px; font-weight:bold;">${db.siteSettings.announcementText}</span>`;
     }
 
     const html = `
@@ -177,7 +174,7 @@ app.get('/', (req, res) => {
             <h1 id="t1" style="font-size: 22px; margin: 0 0 10px 0; line-height: 1.4;">أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
             <p style="font-size: 13px; margin: 0 auto; max-width: 450px; opacity: 0.9; line-height: 1.6;">منصة ClickShop تمنحك كل الأدوات اللازمة لإدارة منتجاتك، استقبال طلباتك، وتوسيع تجارتك بكل سهولة واحترافية.</p>
             <div style="margin-top: 15px;">
-                <a href="/register-page" class="btn" style="background:#fff; color:#008060; display:inline-block; width:auto; padding:9px 20px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">ابدأ متجرك الآن 🚀</a>
+                <a href="/register-page" class="btn" style="background:#fff; color:#1b2a4a; display:inline-block; width:auto; padding:9px 20px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">ابدأ متجرك الآن 🚀</a>
             </div>
         </div>
 
@@ -186,7 +183,7 @@ app.get('/', (req, res) => {
                 ${announcementHTML}
             </div>
             
-            <h3 id="t2" style="color:#008060; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
+            <h3 id="t2" style="color:#1b2a4a; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
             <p id="desc" style="font-size:13px; color:#4b5563; line-height:1.6; text-align:center; margin-bottom:20px;">
                 نحن نعمل على مدار الساعة طوال أيام الأسبوع (<b>24/7</b>) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب!
             </p>
@@ -204,7 +201,7 @@ app.get('/admin-login', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:20px 0; text-align:center;">
-                <h2 style="color:#008060; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
+                <h2 style="color:#1b2a4a; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 <form action="/admin-auth" method="POST">
                     <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required>
                     <button type="submit" class="btn btn-green">دخول</button>
@@ -228,9 +225,9 @@ app.get('/admin-dashboard', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:600px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:15px 0;">
-                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
+                <h2 style="color:#1b2a4a; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 
-                <h3 style="font-size:15px; color:#333;">تخصيص مساحة الإعلانات (نص أو رفع صورة من المعرض):</h3>
+                <h3 style="font-size:15px; color:#333;">تخصيص مساحة الإعلانات:</h3>
                 <form action="/admin/update-announcement" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
                     <label>نوع الإعلان:</label>
                     <select name="announcementType" style="margin-bottom:10px;">
@@ -244,7 +241,7 @@ app.get('/admin-dashboard', (req, res) => {
                     <label>اختر صورة الإعلان من الهاتف (Gallery):</label>
                     <input type="file" name="announcementImageFile" accept="image/*" style="margin-bottom:10px; background:#fff;">
                     
-                    <button type="submit" class="btn" style="background:#f59e0b; color:#fff; padding:10px;">حفظ وتحديث الإعلان 📢</button>
+                    <button type="submit" class="btn" style="background:#d4b996; color:#1b2a4a; padding:10px;">حفظ وتحديث الإعلان 📢</button>
                 </form>
 
                 <label>توليد كود تفعيل جديد:</label>
@@ -259,7 +256,7 @@ app.get('/admin-dashboard', (req, res) => {
 
                 <label>المتاجر المسجلة (${db.stores.length}):</label>
                 ${db.stores.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
-                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
+                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#1b2a4a; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
                 
                 <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← تسجيل الخروج للرئيسية</a>
             </div>
@@ -310,16 +307,16 @@ app.get('/register-page', (req, res) => {
     const html = `
         <div style="padding:12px; max-width:500px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:10px 0;">
-                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">بيانات متجرك الجديد</h2>
+                <h2 style="color:#1b2a4a; text-align:center; margin-top:0; font-size:18px;">بيانات متجرك الجديد</h2>
                 
-                <div style="border: 2px solid #008060; background:#f0fdf4; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center; color:#065f46; font-weight:bold; font-size:13px;">
+                <div style="border: 2px solid #1b2a4a; background:#f4f6f9; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center; color:#1b2a4a; font-weight:bold; font-size:13px;">
                     الوقت المتبقي لإدخال كود التفعيل:<br>
                     <span id="timer" style="color:#dc2626; font-size:20px; display:inline-block; margin-top:3px;">01:15</span>
                 </div>
 
                 <form action="/register" method="POST">
                     <label>كود التفعيل:</label>
-                    <input type="text" name="activationCode" placeholder="مثال: CS-XXXX-XXXX" required style="border-color:#008060;">
+                    <input type="text" name="activationCode" placeholder="مثال: CS-XXXX-XXXX" required style="border-color:#1b2a4a;">
                     
                     <label>اسم المتجر:</label>
                     <input type="text" name="storeName" placeholder="مثال: ClickShop Store" required>
@@ -335,7 +332,7 @@ app.get('/register-page', (req, res) => {
                         <option value="أجهزة منزلية">أجهزة منزلية</option>
                     </select>
 
-                    <label>لون واجهة المتجر:</label>
+                    <label>لون واجهة المتجر (أولد موني):</label>
                     <select name="storeColor">
                         ${storeColors.map(c => `<option value="${c.code}">${c.name}</option>`).join('')}
                     </select>
@@ -368,7 +365,7 @@ app.post('/register', (req, res) => {
     if (db.stores.find(s => s.storeSlug === storeSlug.trim())) return res.send(renderLayout('خطأ', '<div style="padding:20px;"><div class="card-box" style="text-align:center;"><h3 style="color:red; font-size:16px;">رابط المتجر محجوز مسبقاً!</h3><a href="/register-page" class="btn btn-green">عودة</a></div></div>'));
     
     const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 6);
-    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#008060', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
+    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#1b2a4a', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
     db.activeCodes.splice(idx, 1);
     db.usedCodes.push(activationCode.trim());
     saveDB();
@@ -376,9 +373,9 @@ app.post('/register', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
             <div class="card-box" style="text-align:center; margin:20px 0;">
-                <h2 style="color:#008060; margin-top:0; font-size:18px;">مبروك ${ownerName}! تم إنشاء المتجر 🚀</h2>
+                <h2 style="color:#1b2a4a; margin-top:0; font-size:18px;">مبروك ${ownerName}! تم إنشاء المتجر 🚀</h2>
                 <div style="display:flex; flex-direction:column; gap:10px; margin-top:18px;">
-                    <a href="/store/${storeSlug.trim()}" class="btn btn-blue">فتح المتجر 🛒</a>
+                    <a href="/store/${storeSlug.trim()}" class="btn" style="background:#3d2314; color:#fff;">فتح المتجر 🛒</a>
                     <a href="/store/${storeSlug.trim()}/login" class="btn btn-green">لوحة التحكم ⚙️</a>
                 </div>
             </div>
@@ -391,7 +388,7 @@ app.get('/login-store', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:400px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:20px 0;">
-                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">تسجيل دخول التجار ⚙️</h2>
+                <h2 style="color:#1b2a4a; margin-top:0; font-size:18px;">تسجيل دخول التجار ⚙️</h2>
                 <form action="/login-store-direct" method="POST">
                     <label>رابط المتجر بالإنجليزية (Slug):</label>
                     <input type="text" name="storeSlug" placeholder="مثال: my-store" required>
@@ -420,7 +417,7 @@ app.get('/store/:slug/login', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:400px; margin:0 auto; width:100%;">
             <div class="card-box" style="text-align:center; margin:20px 0;">
-                <h2 style="color:#008060; margin-top:0; font-size:18px;">كلمة مرور لوحة التحكم</h2>
+                <h2 style="color:#1b2a4a; margin-top:0; font-size:18px;">كلمة مرور لوحة التحكم</h2>
                 <form action="/store/${req.params.slug}/auth" method="POST">
                     <input type="password" name="password" placeholder="أدخل كلمة المرور" required>
                     <button type="submit" class="btn btn-green">دخول</button>
@@ -448,10 +445,10 @@ app.get('/store/:slug/dashboard', (req, res) => {
         <div style="padding:12px; max-width:600px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:10px 0;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                    <a href="/store/${store.storeSlug}" target="_blank" style="background:#2563eb; color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">معاينة المتجر 🛒</a>
+                    <a href="/store/${store.storeSlug}" target="_blank" style="background:#3d2314; color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">معاينة المتجر 🛒</a>
                     <a href="/" style="background:#4b5563; color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">الرئيسية 🏠</a>
                 </div>
-                <h2 style="color:${store.storeColor || '#008060'}; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
+                <h2 style="color:${store.storeColor || '#1b2a4a'}; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
                 <hr style="border:0; border-top:1px solid #eee; margin:12px 0;">
                 
                 <h3 style="font-size:15px; margin-top:0;">إضافة منتج (${store.products.length}/10)</h3>
@@ -463,14 +460,24 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <input type="text" name="productPrice" required>
                     <label>وصف المنتج وتفاصيله:</label>
                     <textarea name="productDesc" rows="3" placeholder="اكتب وصفاً جذاباً للمنتج..." required></textarea>
-                    <label>صورة المنتج (من معرض الهاتف Gallery):</label>
-                    <input type="file" name="productImageFile" accept="image/*" required style="background:#fff;">
-                    <label>الألوان المتاحة (اختياري، افصل بفاصلة):</label>
-                    <input type="text" name="colors" placeholder="أسود، أبيض">
+                    <label>صور المنتج (يمكنك اختيار عدة صور من معرض الهاتف Gallery):</label>
+                    <input type="file" name="productImages" accept="image/*" multiple required style="background:#fff;">
+                    <label>الأنواع / الألوان المتاحة (من كلمة واحدة، افصل بفاصلة):</label>
+                    <input type="text" name="colors" placeholder="كشميري، زيتوني، كحلي">
                     <label>المقاسات المتاحة (اختياري، افصل بفاصلة):</label>
                     <input type="text" name="sizes" placeholder="S, M, L">
-                    <button type="submit" class="btn" style="background:${store.storeColor || '#008060'}; color:#fff;">إضافة المنتج ➕</button>
+                    <button type="submit" class="btn" style="background:${store.storeColor || '#1b2a4a'}; color:#fff;">إضافة المنتج ➕</button>
                 </form>`}
+
+                <h3 style="margin-top:20px; font-size:15px;">الطلبات الواردة (${store.orders.length}):</h3>
+                ${store.orders.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد طلبات مسجلة بعد.</p>' : ''}
+                ${store.orders.map(o => `
+                    <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:8px; font-size:12px;">
+                        <div><b>#${o.trackingId}</b> - ${o.productName} (${o.price} دج)</div>
+                        <div style="color:#4b5563; margin-top:3px;">الزبون: ${o.firstName} ${o.lastName} | الهاتف: ${o.phone} | الولاية: ${o.state}</div>
+                        <div style="color:#6b7280; margin-top:2px;">الكمية: ${o.quantity} | اللون: ${o.color || 'غير محدد'} | المقاس: ${o.size || 'غير محدد'}</div>
+                    </div>
+                `).join('')}
 
                 <h3 style="margin-top:20px; font-size:15px;">المنتجات الحالية:</h3>
                 ${store.products.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد منتجات مضافة بعد.</p>' : ''}
@@ -489,24 +496,25 @@ app.get('/store/:slug/dashboard', (req, res) => {
     res.send(renderLayout(`لوحة تحكم ${store.storeName}`, html));
 });
 
-app.post('/store/:slug/add-product', upload.single('productImageFile'), (req, res) => {
+// دعم رفع عدة صور للمنتج
+app.post('/store/:slug/add-product', upload.array('productImages', 5), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
-        let imgUrl = "https://i.ibb.co/6P82W8h/default-avatar.png";
-        if (req.file) {
-            imgUrl = '/uploads/' + req.file.filename;
+        let imageUrls = ["https://i.ibb.co/6P82W8h/default-avatar.png"];
+        if (req.files && req.files.length > 0) {
+            imageUrls = req.files.map(f => '/uploads/' + f.filename);
         }
         store.products.push({ 
             name: req.body.productName, 
             price: req.body.productPrice, 
             desc: req.body.productDesc || "",
-            image: imgUrl, 
+            images: imageUrls, 
             colors: req.body.colors || "", 
             sizes: req.body.sizes || "" 
         });
         saveDB();
     }
-    res.redirect(`/store/${req.params.slug}/dashboard`);
+    res.redirect(`/store/${store.storeSlug}/dashboard`);
 });
 
 app.post('/store/:slug/delete-product', (req, res) => {
@@ -515,7 +523,7 @@ app.post('/store/:slug/delete-product', (req, res) => {
         store.products.splice(parseInt(req.body.productIndex), 1);
         saveDB();
     }
-    res.redirect(`/store/${req.params.slug}/dashboard`);
+    res.redirect(`/store/${store.storeSlug}/dashboard`);
 });
 
 app.post('/store/:slug/checkout', async (req, res) => {
@@ -525,7 +533,8 @@ app.post('/store/:slug/checkout', async (req, res) => {
     const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
     const totalPrice = parseFloat(price) * parseInt(quantity || 1);
     
-    store.orders.push({ trackingId, productName, price: totalPrice, firstName, lastName, phone, state, quantity, color, size });
+    // حفظ الطلب في قاعدة بيانات المتجر لتظهر في لوحة التحكم
+    store.orders.unshift({ trackingId, productName, price: totalPrice, firstName, lastName, phone, state, quantity, color, size });
     saveDB();
 
     if (store.telegramChatId) {
@@ -542,7 +551,7 @@ app.post('/store/:slug/checkout', async (req, res) => {
         </style>
         <div style="padding:15px; max-width:450px; margin:40px auto; width:100%;">
             <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.08); text-align:center;">
-                <h2 style="color:${store.storeColor || '#008060'}; margin-top:0;">تم إرسال الطلب بنجاح! 🎉</h2>
+                <h2 style="color:${store.storeColor || '#1b2a4a'}; margin-top:0;">تم إرسال الطلب بنجاح! 🎉</h2>
                 <p style="color:#4b5563; font-size:13px; margin-bottom:18px;">رقم التتبع الخاص بك: <b>#${trackingId}</b></p>
                 <a href="https://wa.me/${store.whatsapp}?text=${wa}" style="display:block; background:#25d366; color:#fff; padding:13px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:15px;">تأكيد الطلب عبر واتساب التاجر 📱</a>
             </div>
@@ -552,11 +561,11 @@ app.post('/store/:slug/checkout', async (req, res) => {
     res.send(html);
 });
 
-// تصميم متجر احترافي ببطاقات منتجات كبيرة، صور واضحة، الوصف، وزر الطلب تحت الوصف مباشرة
+// تصميم متجر الأولد موني الفخم مع عرض الصور المتعددة، ميزة التكبير، الوصف، وزر الطلب تحت الوصف
 app.get('/store/:slug', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.status(404).send('المتجر غير موجود');
-    const themeColor = store.storeColor || '#008060';
+    const themeColor = store.storeColor || '#1b2a4a';
     
     res.send(`
         <!DOCTYPE html>
@@ -567,21 +576,31 @@ app.get('/store/:slug', (req, res) => {
             <title>${store.storeName}</title>
             <style>
                 * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
-                body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
+                body { margin: 0; padding: 0; background: #fdfbf7; color: #111827; width: 100%; overflow-x: hidden; }
                 .store-header { background: ${themeColor}; color: #fff; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; }
                 .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 12px; }
                 
-                /* بطاقة المنتج الاحترافية الكبيرة */
-                .product-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
-                .product-img { width: 100%; height: 240px; object-fit: cover; }
+                .product-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+                
+                /* تنسيق صور المنتج المتعددة */
+                .product-images-grid { display: flex; gap: 8px; padding: 12px; overflow-x: auto; background: #faf9f6; }
+                .product-thumb { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1.5px solid #d4b996; transition: 0.2s; flex-shrink: 0; }
+                .product-thumb:hover { transform: scale(1.03); }
+                .main-img-container { width: 100%; height: 280px; overflow: hidden; background: #000; position: relative; }
+                .main-product-img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
                 .product-info { padding: 15px; text-align: right; }
-                .product-title { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #111827; }
-                .product-price { font-size: 16px; font-weight: bold; color: ${themeColor}; margin-bottom: 8px; }
+                .product-title { font-size: 19px; font-weight: bold; margin: 0 0 5px 0; color: #1b2a4a; }
+                .product-price { font-size: 17px; font-weight: bold; color: ${themeColor}; margin-bottom: 10px; }
                 .product-desc { font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 12px; }
                 .product-meta { font-size: 12px; color: #6b7280; margin-bottom: 15px; }
                 
-                .order-btn { display: block; width: 100%; background: ${themeColor}; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+                .order-btn { display: block; width: 100%; background: ${themeColor}; color: #fff; border: none; padding: 13px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
                 .order-btn:hover { opacity: 0.9; }
+
+                /* نافذة تكبير الصورة (Lightbox) */
+                .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 300; padding: 15px; }
+                .lightbox-img { max-width: 100%; max-height: 85vh; border-radius: 8px; object-fit: contain; }
 
                 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 200; padding: 12px; }
                 .modal-content { background: #fff; padding: 18px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: right; }
@@ -599,20 +618,37 @@ app.get('/store/:slug', (req, res) => {
             
             <div class="container">
                 ${store.products.length === 0 ? '<div style="background:#fff; padding:30px; border-radius:12px; text-align:center; color:#6b7280; font-size:14px;">لا توجد منتجات معروضة حالياً في هذا المتجر.</div>' : ''}
-                ${store.products.map(p => `
+                ${store.products.map((p, idx) => {
+                    let imgs = p.images || [p.image || "https://i.ibb.co/6P82W8h/default-avatar.png"];
+                    return `
                     <div class="product-card">
-                        <img src="${p.image}" class="product-img">
+                        <!-- الصورة الرئيسية التي تكبر عند النقر -->
+                        <div class="main-img-container">
+                            <img src="${imgs[0]}" id="mainImg_${idx}" class="main-product-img" onclick="openLightbox(this.src)">
+                        </div>
+                        
+                        <!-- معرض صور المنتج المصغرة لاختيارها -->
+                        ${imgs.length > 1 ? `
+                        <div class="product-images-grid">
+                            ${imgs.map(img => `<img src="${img}" class="product-thumb" onclick="document.getElementById('mainImg_${idx}').src='${img}'">`).join('')}
+                        </div>` : ''}
+
                         <div class="product-info">
                             <h3 class="product-title">${p.name}</h3>
                             <div class="product-price">${p.price} دج</div>
                             <div class="product-desc">${p.desc || 'لا يوجد وصف مضاف لهذا المنتج.'}</div>
                             <div class="product-meta">${p.colors ? 'الأنواع/الألوان: ' + p.colors : ''} ${p.sizes ? ' | المقاسات: ' + p.sizes : ''}</div>
                             
-                            <!-- زر الطلب أصبح تحت الوصف مباشرة وبشكل بارز وأنيق -->
+                            <!-- زر الطلب أصبح تحت الوصف مباشرة -->
                             <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
-                    </div>
-                `).join('')}
+                    </div>`;
+                }).join('')}
+            </div>
+
+            <!-- نافذة تكبير الصورة -->
+            <div id="lightbox" class="lightbox-modal" onclick="this.style.display='none'">
+                <img id="lightboxImg" class="lightbox-img">
             </div>
 
             <div id="m" class="modal">
@@ -649,6 +685,11 @@ app.get('/store/:slug', (req, res) => {
             </div>
 
             <script>
+                function openLightbox(src){
+                    document.getElementById('lightboxImg').src = src;
+                    document.getElementById('lightbox').style.display = 'flex';
+                }
+
                 function openModal(n,p,cols,szs){
                     document.getElementById('pn').value=n;
                     document.getElementById('pp').value=p;
