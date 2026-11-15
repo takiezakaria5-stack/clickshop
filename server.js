@@ -106,7 +106,7 @@ function renderLayout(title, content, extraHead = '') {
             <!-- النقر على اسم المنصة مخفي لدخول المدير العام -->
             <a href="/admin-login" class="brand" title="لوحة المدير العام">
                 <div class="logo-circle">Logo</div>
-                <h1 id="brand-title">ClickShop</h1>
+                <h1>ClickShop</h1>
             </a>
             <div class="nav-actions">
                 <button class="lang-btn" onclick="setLang('ar')">عربي</button>
@@ -297,10 +297,10 @@ app.get('/register-page', (req, res) => {
                     <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required style="border-color:#008060;">
                     
                     <label>اسم المتجر:</label>
-                    <input type="text" name="storeName" placeholder="مثال: ZASO Store" required>
+                    <input type="text" name="storeName" placeholder="مثال: ClickShop Store" required>
                     
                     <label>رابط المتجر بالإنجليزية (Slug):</label>
-                    <input type="text" name="storeSlug" placeholder="zaso-store" required>
+                    <input type="text" name="storeSlug" placeholder="clickshop-store" required>
                     
                     <label>مجال التجارة:</label>
                     <select name="storeCategory" required>
