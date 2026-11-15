@@ -22,7 +22,9 @@ let db = {
         logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
         whatsapp: "213700000000",
         telegramBotToken: "",
-        announcement: "📢 مكان مخصص للإعلانات والعروض الخاصة بك هنا"
+        announcementType: "text", // text or image
+        announcementText: "📢 مكان مخصص للإعلانات والعروض الخاصة بك هنا",
+        announcementImage: ""
     },
     activeCodes: [
         { code: "CS-9X4F-7B2K", createdAt: "2026-11-15 10:00" },
@@ -83,14 +85,14 @@ function renderLayout(title, content, extraHead = '') {
             * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
             body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
             .navbar { background: #008060; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; width: 100%; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-            .brand { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; color: #fff; }
-            .brand h1 { margin: 0; font-size: 18px; }
-            .logo-circle { background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 9px; }
-            .nav-actions { display: flex; gap: 6px; align-items: center; }
-            .lang-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
+            .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; color: #fff; }
+            .brand h1 { margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
+            .logo-circle { background: #fff; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 11px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
+            .nav-actions { display: flex; gap: 4px; align-items: center; }
+            .lang-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 3px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; }
             .hero-section { background: linear-gradient(135deg, #008060 0%, #046c51 100%); color: #fff; padding: 30px 15px; text-align: center; width: 100%; }
             .card-box { background: #fff; margin: -20px 12px 15px 12px; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); color: #111827; text-align: right; }
-            .announcement { border: 2px dashed #f59e0b; background: #fffbeb; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #b45309; font-size: 13px; font-weight: bold; text-align: center; }
+            .announcement-box { border: 2px dashed #f59e0b; background: #fffbeb; padding: 12px; border-radius: 10px; margin-bottom: 18px; text-align: center; min-height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
             .btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; text-align: center; }
             .btn-green { background: #008060; color: #fff; }
             .btn-blue { background: #2563eb; color: #fff; }
@@ -103,7 +105,6 @@ function renderLayout(title, content, extraHead = '') {
     </head>
     <body>
         <div class="navbar">
-            <!-- النقر على اسم المنصة مخفي لدخول المدير العام -->
             <a href="/admin-login" class="brand" title="لوحة المدير العام">
                 <div class="logo-circle">Logo</div>
                 <h1>ClickShop</h1>
@@ -126,19 +127,19 @@ function renderLayout(title, content, extraHead = '') {
                 if(l==='fr'){
                     t1.innerText="Créez votre boutique pro en secondes";
                     t2.innerText="Comment fonctionne ClickShop ?";
-                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de votre boutique, recevoir les commandes des clients instantanément via Telegram et WhatsApp, avec un contrôle total des couleurs et de l'identité !";
+                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de votre boutique, recevoir les commandes instantanément via Telegram et WhatsApp !";
                     b1.innerText="🚀 Créer ma nouvelle boutique";
                     b2.innerText="⚙️ Connexion Marchand";
                 }else if(l==='en'){
                     t1.innerText="Create your pro store in seconds";
                     t2.innerText="How does ClickShop work?";
-                    desc.innerText="We work 24/7 to ensure your store stability, receive customer orders instantly via Telegram and WhatsApp, with full control over branding and colors!";
+                    desc.innerText="We work 24/7 to ensure your store stability, receive customer orders instantly via Telegram and WhatsApp!";
                     b1.innerText="🚀 Create New Store";
                     b2.innerText="⚙️ Merchant Login";
                 }else{
                     t1.innerText="أطلق متجرك الإلكتروني الاحترافي في دقائق";
                     t2.innerText="كيف تعمل منصة ClickShop؟ ⚙️";
-                    desc.innerText="نحن نعمل على مدار الساعة طوال أيام الأسبوع (24/7) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب، مع تحكم كامل بالهوية والألوان!";
+                    desc.innerText="نحن نعمل على مدار الساعة طوال أيام الأسبوع (24/7) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب!";
                     b1.innerText="🚀 ابدأ إنشاء متجرك الجديد";
                     b2.innerText="⚙️ تسجيل دخول التجار";
                 }
@@ -149,6 +150,13 @@ function renderLayout(title, content, extraHead = '') {
 }
 
 app.get('/', (req, res) => {
+    let announcementHTML = '';
+    if (db.siteSettings.announcementType === 'image' && db.siteSettings.announcementImage) {
+        announcementHTML = `<img src="${db.siteSettings.announcementImage}" style="width:100%; max-height:160px; object-fit:cover; border-radius:8px;">`;
+    } else {
+        announcementHTML = `<span style="color:#b45309; font-size:14px; font-weight:bold;">${db.siteSettings.announcementText}</span>`;
+    }
+
     const html = `
         <div class="hero-section">
             <h1 id="t1" style="font-size: 22px; margin: 0 0 10px 0; line-height: 1.4;">أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
@@ -159,11 +167,13 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="card-box">
-            <div class="announcement">${db.siteSettings.announcement}</div>
+            <div class="announcement-box">
+                ${announcementHTML}
+            </div>
             
             <h3 id="t2" style="color:#008060; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
             <p id="desc" style="font-size:13px; color:#4b5563; line-height:1.6; text-align:center; margin-bottom:20px;">
-                نحن نعمل على مدار الساعة طوال أيام الأسبوع (<b>24/7</b>) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب، مع تحكم كامل بالهوية والألوان!
+                نحن نعمل على مدار الساعة طوال أيام الأسبوع (<b>24/7</b>) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب!
             </p>
 
             <div style="display:flex; flex-direction:column; gap:12px;">
@@ -220,10 +230,21 @@ app.get('/admin-dashboard', (req, res) => {
             <div class="card-box" style="margin:15px 0;">
                 <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 
-                <label>تحديث نص الإعلان في الواجهة:</label>
-                <form action="/admin/update-announcement" method="POST" style="margin-bottom:15px;">
-                    <input type="text" name="announcement" value="${db.siteSettings.announcement}" required>
-                    <button type="submit" class="btn" style="background:#f59e0b; color:#fff; padding:10px;">تحديث الإعلان 📢</button>
+                <h3 style="font-size:15px; color:#333;">تخصيص مساحة الإعلانات (نص أو صورة من المعرض):</h3>
+                <form action="/admin/update-announcement" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
+                    <label>نوع الإعلان:</label>
+                    <select name="announcementType" style="margin-bottom:10px;">
+                        <option value="text" ${db.siteSettings.announcementType === 'text' ? 'selected' : ''}>نص إعلاني</option>
+                        <option value="image" ${db.siteSettings.announcementType === 'image' ? 'selected' : ''}>صورة إعلانية</option>
+                    </select>
+
+                    <label>النص الإعلاني:</label>
+                    <input type="text" name="announcementText" value="${db.siteSettings.announcementText}" style="margin-bottom:10px;">
+
+                    <label>أو إرفاق رابط صورة إعلانية (Image URL):</label>
+                    <input type="text" name="announcementImage" value="${db.siteSettings.announcementImage}" placeholder="https://..." style="margin-bottom:10px;">
+
+                    <button type="submit" class="btn" style="background:#f59e0b; color:#fff; padding:10px;">حفظ وتحديث الإعلان 📢</button>
                 </form>
 
                 <label>توليد كود تفعيل جديد:</label>
@@ -248,7 +269,9 @@ app.get('/admin-dashboard', (req, res) => {
 });
 
 app.post('/admin/update-announcement', (req, res) => {
-    db.siteSettings.announcement = req.body.announcement;
+    db.siteSettings.announcementType = req.body.announcementType || 'text';
+    db.siteSettings.announcementText = req.body.announcementText || '';
+    db.siteSettings.announcementImage = req.body.announcementImage || '';
     saveDB();
     res.redirect('/admin-dashboard');
 });
@@ -531,7 +554,6 @@ app.get('/store/:slug', (req, res) => {
         </head>
         <body>
             <header class="store-header">
-                <!-- زر مخفي لدخول لوحة تحكم التاجر عند النقر على شعار متجره -->
                 <a href="/store/${store.storeSlug}/login" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#fff;" title="دخول لوحة تحكم التاجر">
                     <div style="background:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:${themeColor}; font-weight:bold; font-size:9px;">Logo</div>
                     <h1 style="font-size:17px; margin:0;">🛒 ${store.storeName}</h1>
