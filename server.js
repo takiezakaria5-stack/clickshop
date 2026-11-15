@@ -110,8 +110,8 @@ function renderLayout(title, content, extraHead = '') {
             .btn-green { background: #008060; color: #fff; }
             .btn-blue { background: #2563eb; color: #fff; }
             label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #374151; }
-            input, select { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
-            input:focus, select:focus { outline: none; border-color: #008060; }
+            input, select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
+            input:focus, select:focus, textarea:focus { outline: none; border-color: #008060; }
         </style>
         ${extraHead}
     </head>
@@ -194,21 +194,6 @@ app.get('/', (req, res) => {
             <div style="display:flex; flex-direction:column; gap:12px;">
                 <a href="/register-page" id="b1" class="btn btn-green">🚀 ابدأ إنشاء متجرك الجديد</a>
                 <a href="/login-store" id="b2" class="btn btn-blue">⚙️ تسجيل دخول التجار</a>
-            </div>
-
-            <div style="display:flex; justify-content:center; gap:15px; margin-top:25px; padding-top:18px; border-top:1px solid #f3f4f6;">
-                <a href="https://t.me/" target="_blank" style="background:#0088cc; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Telegram">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.06-.78 4.15-1.81 6.91-3.01 8.28-3.61 3.94-1.72 4.76-2.02 5.29-2.03.12 0 .39.03.56.17.15.12.19.28.21.4-.02.08-.02.2-.04.35z"/></svg>
-                </a>
-                <a href="https://facebook.com" target="_blank" style="background:#1877f2; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Facebook">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.15 6.5 13 6.5c.88 0 1.76.08 2.6.24v2.85h-1.47c-.99 0-1.3.49-1.3 1.25V12h3.02l-.48 3h-2.54v6.8c4.56-.93 8-4.96 8-9.8z"/></svg>
-                </a>
-                <a href="https://instagram.com" target="_blank" style="background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Instagram">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                </a>
-                <a href="https://whatsapp.com" target="_blank" style="background:#25d366; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="WhatsApp">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                </a>
             </div>
         </div>
     `;
@@ -402,7 +387,6 @@ app.post('/register', (req, res) => {
     res.send(renderLayout('تم إنشاء المتجر', html));
 });
 
-// صفحة تسجيل دخول التجار المحدثة (إدخال رابط المتجر وكلمة المرور مباشرة)
 app.get('/login-store', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:400px; margin:0 auto; width:100%;">
@@ -477,6 +461,8 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <input type="text" name="productName" required>
                     <label>السعر (دج):</label>
                     <input type="text" name="productPrice" required>
+                    <label>وصف المنتج وتفاصيله:</label>
+                    <textarea name="productDesc" rows="3" placeholder="اكتب وصفاً جذاباً للمنتج..." required></textarea>
                     <label>صورة المنتج (من معرض الهاتف Gallery):</label>
                     <input type="file" name="productImageFile" accept="image/*" required style="background:#fff;">
                     <label>الألوان المتاحة (اختياري، افصل بفاصلة):</label>
@@ -513,6 +499,7 @@ app.post('/store/:slug/add-product', upload.single('productImageFile'), (req, re
         store.products.push({ 
             name: req.body.productName, 
             price: req.body.productPrice, 
+            desc: req.body.productDesc || "",
             image: imgUrl, 
             colors: req.body.colors || "", 
             sizes: req.body.sizes || "" 
@@ -565,6 +552,7 @@ app.post('/store/:slug/checkout', async (req, res) => {
     res.send(html);
 });
 
+// تصميم متجر احترافي ببطاقات منتجات كبيرة، صور واضحة، الوصف، وزر الطلب تحت الوصف مباشرة
 app.get('/store/:slug', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.status(404).send('المتجر غير موجود');
@@ -582,7 +570,19 @@ app.get('/store/:slug', (req, res) => {
                 body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
                 .store-header { background: ${themeColor}; color: #fff; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; }
                 .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 12px; }
-                .product-card { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+                
+                /* بطاقة المنتج الاحترافية الكبيرة */
+                .product-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; }
+                .product-img { width: 100%; height: 240px; object-fit: cover; }
+                .product-info { padding: 15px; text-align: right; }
+                .product-title { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #111827; }
+                .product-price { font-size: 16px; font-weight: bold; color: ${themeColor}; margin-bottom: 8px; }
+                .product-desc { font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 12px; }
+                .product-meta { font-size: 12px; color: #6b7280; margin-bottom: 15px; }
+                
+                .order-btn { display: block; width: 100%; background: ${themeColor}; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+                .order-btn:hover { opacity: 0.9; }
+
                 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 200; padding: 12px; }
                 .modal-content { background: #fff; padding: 18px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: right; }
                 label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #374151; }
@@ -598,18 +598,19 @@ app.get('/store/:slug', (req, res) => {
             </header>
             
             <div class="container">
-                ${store.products.length === 0 ? '<div style="background:#fff; padding:25px; border-radius:12px; text-align:center; color:#6b7280; font-size:13px;">لا توجد منتجات معروضة حالياً.</div>' : ''}
+                ${store.products.length === 0 ? '<div style="background:#fff; padding:30px; border-radius:12px; text-align:center; color:#6b7280; font-size:14px;">لا توجد منتجات معروضة حالياً في هذا المتجر.</div>' : ''}
                 ${store.products.map(p => `
                     <div class="product-card">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${p.image}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
-                            <div>
-                                <h4 style="margin:0 0 3px 0; font-size:14px;">${p.name}</h4>
-                                <span style="color:${themeColor}; font-weight:bold; font-size:14px;">${p.price} دج</span>
-                                <div style="font-size:11px; color:#6b7280; margin-top:2px;">${p.colors ? 'ألوان: ' + p.colors : ''} ${p.sizes ? ' | مقاسات: ' + p.sizes : ''}</div>
-                            </div>
+                        <img src="${p.image}" class="product-img">
+                        <div class="product-info">
+                            <h3 class="product-title">${p.name}</h3>
+                            <div class="product-price">${p.price} دج</div>
+                            <div class="product-desc">${p.desc || 'لا يوجد وصف مضاف لهذا المنتج.'}</div>
+                            <div class="product-meta">${p.colors ? 'الأنواع/الألوان: ' + p.colors : ''} ${p.sizes ? ' | المقاسات: ' + p.sizes : ''}</div>
+                            
+                            <!-- زر الطلب أصبح تحت الوصف مباشرة وبشكل بارز وأنيق -->
+                            <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
-                        <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" style="background:${themeColor}; color:#fff; border:none; padding:9px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px; white-space:nowrap;">اطلب الآن 🛍️</button>
                     </div>
                 `).join('')}
             </div>
