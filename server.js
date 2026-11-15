@@ -23,6 +23,7 @@ const upload = multer({ storage: storage });
 
 const DB_FILE = path.join(__dirname, 'database.json');
 
+// قاعدة البيانات الافتراضية
 let db = {
     stores: [],
     siteSettings: {
@@ -41,6 +42,7 @@ let db = {
     usedCodes: []
 };
 
+// قراءة البيانات من الملف الخارجي لضمان عدم ضياع أي شيء
 if (fs.existsSync(DB_FILE)) {
     try {
         db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
@@ -267,7 +269,7 @@ app.get('/admin-dashboard', (req, res) => {
 
                 <label>المتاجر المسجلة (${db.stores.length}):</label>
                 ${db.stores.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
-                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:#1b2a4a; font-weight:bold;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#1b2a4a; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
+                ${db.stores.map((s, idx) => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:#1b2a4a; font-weight:bold;"><b>${s.storeName}</b></span><div style="display:flex; gap:5px;"><a href="/store/${s.storeSlug}" target="_blank" style="background:#1b2a4a; color:#fff; padding:4px 8px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة</a><form action="/admin/delete-store" method="POST" style="margin:0;"><input type="hidden" name="storeIndex" value="${idx}"><button type="submit" style="background:#dc2626; color:#fff; border:none; padding:4px 8px; cursor:pointer; border-radius:4px; font-size:11px;">حذف</button></form></div></div>`).join('')}
                 
                 <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← تسجيل الخروج للرئيسية</a>
             </div>
@@ -300,6 +302,14 @@ app.post('/admin/generate-code', (req, res) => {
     const dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     db.activeCodes.push({ code: randomCode, createdAt: dateStr });
     saveDB();
+    res.redirect('/admin-dashboard');
+});
+
+app.post('/admin/delete-store', (req, res) => {
+    if (req.body.storeIndex !== undefined) {
+        db.stores.splice(parseInt(req.body.storeIndex), 1);
+        saveDB();
+    }
     res.redirect('/admin-dashboard');
 });
 
@@ -451,7 +461,7 @@ app.get('/store/:slug/login', (req, res) => {
 app.post('/store/:slug/auth', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.password === req.body.password) {
-        res.redirect(`/store/${req.params.slug}/dashboard`);
+        res.redirect(`/store/${store.storeSlug}/dashboard`);
     } else {
         res.send(`<script>alert('كلمة المرور خطأ!'); window.location.href='/store/${req.params.slug}/login';</script>`);
     }
@@ -673,7 +683,7 @@ app.get('/store/:slug', (req, res) => {
                             
                             <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
-                    `;
+                    </div>`;
                 }).join('')}
             </div>
 
