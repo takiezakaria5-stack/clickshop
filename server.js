@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const uploadDir = path.join(__dirname, 'public/uploads');
@@ -38,7 +37,6 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// دالة إرسال إشعار تيليغرام أوتوماتيكي للتاجر
 async function sendTelegramNotification(chatId, message) {
     if (!chatId || !db.siteSettings.telegramBotToken) return;
     try {
@@ -48,9 +46,7 @@ async function sendTelegramNotification(chatId, message) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
         });
-    } catch (e) {
-        console.error("Telegram error:", e);
-    }
+    } catch (e) {}
 }
 
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة", "59. تيزي وزو", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"];
@@ -125,7 +121,7 @@ app.get('/admin-dashboard', (req, res) => {
                 <p><b>عدد المتاجر النشطة:</b> ${db.stores.length}</p>
                 <p><b>الأكواد المفعلة:</b> ${db.activeCodes.length} كود متاح</p>
                 <h3 style="margin-top:20px;">المتاجر المسجلة:</h3>
-                ${db.stores.length === 0 ? '<p style="color:#666;">لا توجد متاجر بعد.</p>': ''}
+                ${db.stores.length === 0 ? '<p style="color:#666;">لا توجد متاجر بعد.</p>' : ''}
                 ${db.stores.map(s => `<div style="background:#f9fafb; padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b> (${s.storeSlug})</span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:12px;">زيارة المتجر</a></div>`).join('')}
                 <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; margin-top:20px;">← تسجيل الخروج للرئيسية</a>
             </div>
@@ -185,7 +181,7 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/login-store', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>': ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
 });
 
 app.get('/store/:slug/login', (req, res) => {
@@ -233,7 +229,6 @@ app.post('/store/:slug/checkout', async (req, res) => {
     store.orders.push({ trackingId, productName, price, firstName, lastName, phone, state, color, size });
     saveDB();
 
-    // إرسال تنبيه أوتوماتيكي عبر تيليغرام إذا كان التاجر قد أدخل المعرف الخاص به
     if (store.telegramChatId) {
         const msg = `🛒 *طلب جديد في متجرك!*\\n- التتبع: #${trackingId}\\n- الزبون: ${firstName} ${lastName}\\n- الهاتف: ${phone}\\n- الولاية: ${state}\\n- المنتج: ${productName} (${price}دج)\\n- اللون: ${color} | المقاس: ${size}`;
         await sendTelegramNotification(store.telegramChatId, msg);
