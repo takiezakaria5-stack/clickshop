@@ -86,8 +86,8 @@ function renderLayout(title, content, extraHead = '') {
             .brand { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; color: #fff; }
             .brand h1 { margin: 0; font-size: 18px; }
             .logo-circle { background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 9px; }
-            .nav-actions { display: flex; gap: 8px; align-items: center; }
-            .action-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; }
+            .nav-actions { display: flex; gap: 6px; align-items: center; }
+            .lang-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; }
             .hero-section { background: linear-gradient(135deg, #008060 0%, #046c51 100%); color: #fff; padding: 30px 15px; text-align: center; width: 100%; }
             .card-box { background: #fff; margin: -20px 12px 15px 12px; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); color: #111827; text-align: right; }
             .announcement { border: 2px dashed #f59e0b; background: #fffbeb; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #b45309; font-size: 13px; font-weight: bold; text-align: center; }
@@ -103,16 +103,47 @@ function renderLayout(title, content, extraHead = '') {
     </head>
     <body>
         <div class="navbar">
-            <div class="brand" onclick="window.location.href='/'">
+            <!-- النقر على اسم المنصة مخفي لدخول المدير العام -->
+            <a href="/admin-login" class="brand" title="لوحة المدير العام">
                 <div class="logo-circle">Logo</div>
-                <h1>ClickShop</h1>
-            </div>
+                <h1 id="brand-title">ClickShop</h1>
+            </a>
             <div class="nav-actions">
-                <a href="/register-page" class="action-btn" style="background:#fff; color:#008060;">أنشئ متجرك</a>
-                <a href="/login-store" class="action-btn">دخول التجار</a>
+                <button class="lang-btn" onclick="setLang('ar')">عربي</button>
+                <button class="lang-btn" onclick="setLang('fr')">FR</button>
+                <button class="lang-btn" onclick="setLang('en')">EN</button>
             </div>
         </div>
         ${content}
+        <script>
+            function setLang(l){
+                const t1 = document.getElementById('t1');
+                const t2 = document.getElementById('t2');
+                const desc = document.getElementById('desc');
+                const b1 = document.getElementById('b1');
+                const b2 = document.getElementById('b2');
+                if(!t1) return;
+                if(l==='fr'){
+                    t1.innerText="Créez votre boutique pro en secondes";
+                    t2.innerText="Comment fonctionne ClickShop ?";
+                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de votre boutique, recevoir les commandes des clients instantanément via Telegram et WhatsApp, avec un contrôle total des couleurs et de l'identité !";
+                    b1.innerText="🚀 Créer ma nouvelle boutique";
+                    b2.innerText="⚙️ Connexion Marchand";
+                }else if(l==='en'){
+                    t1.innerText="Create your pro store in seconds";
+                    t2.innerText="How does ClickShop work?";
+                    desc.innerText="We work 24/7 to ensure your store stability, receive customer orders instantly via Telegram and WhatsApp, with full control over branding and colors!";
+                    b1.innerText="🚀 Create New Store";
+                    b2.innerText="⚙️ Merchant Login";
+                }else{
+                    t1.innerText="أطلق متجرك الإلكتروني الاحترافي في دقائق";
+                    t2.innerText="كيف تعمل منصة ClickShop؟ ⚙️";
+                    desc.innerText="نحن نعمل على مدار الساعة طوال أيام الأسبوع (24/7) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب، مع تحكم كامل بالهوية والألوان!";
+                    b1.innerText="🚀 ابدأ إنشاء متجرك الجديد";
+                    b2.innerText="⚙️ تسجيل دخول التجار";
+                }
+            }
+        </script>
     </body>
     </html>`;
 }
@@ -120,25 +151,24 @@ function renderLayout(title, content, extraHead = '') {
 app.get('/', (req, res) => {
     const html = `
         <div class="hero-section">
-            <h1 style="font-size: 24px; margin: 0 0 10px 0; line-height: 1.4;">أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
+            <h1 id="t1" style="font-size: 22px; margin: 0 0 10px 0; line-height: 1.4;">أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
             <p style="font-size: 13px; margin: 0 auto; max-width: 450px; opacity: 0.9; line-height: 1.6;">منصة ClickShop تمنحك كل الأدوات اللازمة لإدارة منتجاتك، استقبال طلباتك، وتوسيع تجارتك بكل سهولة واحترافية.</p>
-            <div style="margin-top: 20px;">
-                <a href="/register-page" class="btn" style="background:#fff; color:#008060; display:inline-block; width:auto; padding:10px 25px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">ابدأ متجرك الآن 🚀</a>
+            <div style="margin-top: 15px;">
+                <a href="/register-page" class="btn" style="background:#fff; color:#008060; display:inline-block; width:auto; padding:9px 20px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">ابدأ متجرك الآن 🚀</a>
             </div>
         </div>
 
         <div class="card-box">
             <div class="announcement">${db.siteSettings.announcement}</div>
             
-            <h3 style="color:#008060; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
-            <p style="font-size:13px; color:#4b5563; line-height:1.6; text-align:center; margin-bottom:20px;">
+            <h3 id="t2" style="color:#008060; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
+            <p id="desc" style="font-size:13px; color:#4b5563; line-height:1.6; text-align:center; margin-bottom:20px;">
                 نحن نعمل على مدار الساعة طوال أيام الأسبوع (<b>24/7</b>) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب، مع تحكم كامل بالهوية والألوان!
             </p>
 
             <div style="display:flex; flex-direction:column; gap:12px;">
-                <a href="/register-page" class="btn btn-green">🚀 ابدأ إنشاء متجرك الجديد</a>
-                <a href="/login-store" class="btn btn-blue">⚙️ لوحة تحكم التجار</a>
-                <a href="/admin-login" class="btn" style="background:#4b5563; color:#fff; font-size:13px; padding:10px;">🛠️ دخول المدير العام</a>
+                <a href="/register-page" id="b1" class="btn btn-green">🚀 ابدأ إنشاء متجرك الجديد</a>
+                <a href="/login-store" id="b2" class="btn btn-blue">⚙️ تسجيل دخول التجار</a>
             </div>
 
             <div style="display:flex; justify-content:center; gap:15px; margin-top:25px; padding-top:18px; border-top:1px solid #f3f4f6;">
@@ -163,13 +193,13 @@ app.get('/', (req, res) => {
 app.get('/admin-login', (req, res) => {
     const html = `
         <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
-            <div class="card-box" style="margin:20px 0;">
-                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">دخول المدير العام 🛠️</h2>
+            <div class="card-box" style="margin:20px 0; text-align:center;">
+                <h2 style="color:#008060; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 <form action="/admin-auth" method="POST">
                     <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required>
                     <button type="submit" class="btn btn-green">دخول</button>
                 </form>
-                <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
+                <a href="/" style="display:block; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
             </div>
         </div>
     `;
@@ -459,16 +489,20 @@ app.post('/store/:slug/checkout', async (req, res) => {
     const wa = `السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${quantity}%0A- السعر الإجمالي: ${totalPrice} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`;
     
     const html = `
-        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
-            <div class="card-box" style="text-align:center; margin:20px 0;">
+        <style>
+            * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+            body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; }
+        </style>
+        <div style="padding:15px; max-width:450px; margin:40px auto; width:100%;">
+            <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.08); text-align:center;">
                 <h2 style="color:${store.storeColor || '#008060'}; margin-top:0;">تم إرسال الطلب بنجاح! 🎉</h2>
                 <p style="color:#4b5563; font-size:13px; margin-bottom:18px;">رقم التتبع الخاص بك: <b>#${trackingId}</b></p>
-                <a href="https://wa.me/${store.whatsapp}?text=${wa}" class="btn btn-wa">تأكيد الطلب عبر واتساب التاجر 📱</a>
+                <a href="https://wa.me/${store.whatsapp}?text=${wa}" style="display:block; background:#25d366; color:#fff; padding:13px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:15px;">تأكيد الطلب عبر واتساب التاجر 📱</a>
             </div>
         </div>
         <script>setTimeout(()=>{window.location.href="https://wa.me/${store.whatsapp}?text=${wa}";},2000);</script>
     `;
-    res.send(renderLayout('تم إرسال الطلب', html));
+    res.send(html);
 });
 
 app.get('/store/:slug', (req, res) => {
@@ -497,7 +531,11 @@ app.get('/store/:slug', (req, res) => {
         </head>
         <body>
             <header class="store-header">
-                <h1 style="font-size:17px; margin:0;">🛒 ${store.storeName}</h1>
+                <!-- زر مخفي لدخول لوحة تحكم التاجر عند النقر على شعار متجره -->
+                <a href="/store/${store.storeSlug}/login" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#fff;" title="دخول لوحة تحكم التاجر">
+                    <div style="background:#fff; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:${themeColor}; font-weight:bold; font-size:9px;">Logo</div>
+                    <h1 style="font-size:17px; margin:0;">🛒 ${store.storeName}</h1>
+                </a>
                 <a href="/store/${store.storeSlug}/login" style="background:rgba(255,255,255,0.2); color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:11px; font-weight:bold;">لوحة التحكم ⚙️</a>
             </header>
             
