@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
-const fs = require('fs');
+const fs = require('path').existsSync(path.join(__dirname, 'node_modules')) ? require('fs') : require('fs');
+const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,29 +13,59 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)){
-    fs.existsSync(uploadDir) || fs.mkdirSync(uploadDir, { recursive: true });
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-let stores = [];
+// ملف قاعدة البيانات المحلية لضمان عدم ضياع البيانات
+const DB_FILE = path.join(__dirname, 'database.json');
 
-let siteSettings = {
-    logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
-    whatsapp: "213700000000",
-    instagram: "https://instagram.com",
-    facebook: "https://facebook.com",
-    telegram: "https://t.me"
+let db = {
+    stores: [],
+    siteSettings: {
+        logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
+        whatsapp: "213700000000",
+        instagram: "https://instagram.com",
+        facebook: "https://facebook.com",
+        telegram: "https://t.me",
+        telegramBotToken: "" // توكن بوت تيليغرام الخاص بالمنصة (اختياري للإشعارات)
+    },
+    activeCodes: [
+        "CS-9X4F-7B2K", "CS-3M8R-9P1W", "CS-5V2X-4H8N", "CS-1K9L-6D3Z", "CS-8T4Y-2F5X",
+        "CS-6C3W-8J9M", "CS-2H7P-1Q4V", "CS-4N1Z-5K6B", "CS-7D9F-3X2R", "CS-9L2K-8M7T",
+        "CS-3W5H-4P1Y", "CS-1V8X-9N6C", "CS-5R2J-7Z3Q", "CS-8F4M-6B1K", "CS-2P9T-5W4D",
+        "CS-6X3K-8H7N", "CS-4Z1V-9Q2R", "CS-7M5W-1F8L", "CS-9B6Y-2D3P", "CS-3K8F-4X9T",
+        "CS-1H2N-7J6C", "CS-5Q4R-3V1Z", "CS-8W9X-6M2K", "CS-2D7L-5P8H", "CS-6F1T-9B4W",
+        "CS-4V3Y-8Z2F", "CS-7K9P-1N5X", "CS-9R2M-4H3Q", "CS-3X6C-7D1L", "CS-1T5V-8K9B"
+    ],
+    usedCodes: []
 };
 
-let activeCodes = [
-    "CS-9X4F-7B2K", "CS-3M8R-9P1W", "CS-5V2X-4H8N", "CS-1K9L-6D3Z", "CS-8T4Y-2F5X",
-    "CS-6C3W-8J9M", "CS-2H7P-1Q4V", "CS-4N1Z-5K6B", "CS-7D9F-3X2R", "CS-9L2K-8M7T",
-    "CS-3W5H-4P1Y", "CS-1V8X-9N6C", "CS-5R2J-7Z3Q", "CS-8F4M-6B1K", "CS-2P9T-5W4D",
-    "CS-6X3K-8H7N", "CS-4Z1V-9Q2R", "CS-7M5W-1F8L", "CS-9B6Y-2D3P", "CS-3K8F-4X9T",
-    "CS-1H2N-7J6C", "CS-5Q4R-3V1Z", "CS-8W9X-6M2K", "CS-2D7L-5P8H", "CS-6F1T-9B4W",
-    "CS-4V3Y-8Z2F", "CS-7K9P-1N5X", "CS-9R2M-4H3Q", "CS-3X6C-7D1L", "CS-1T5V-8K9B"
-];
+// تحميل البيانات من الملف إذا كان موجوداً
+if (fs.existsSync(DB_FILE)) {
+    try {
+        const data = fs.readFileSync(DB_FILE, 'utf8');
+        db = JSON.parse(data);
+    } catch (e) {
+        console.log("Error loading DB, using default.", e);
+    }
+}
 
-let usedCodes = [];
+function saveDB() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
+
+// دالة إرسال إشعار تيليغرام أوتوماتيكي للتاجر
+function sendTelegramNotification(chatId, message) {
+    const token = db.siteSettings.telegramBotToken;
+    if (!token || !chatId) return;
+
+    const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
+    https.get(url, (res) => {
+        // رسالة عبر الإنترنت في الخلفية بدون تأثير على سرعة الموقع
+    }).on('error', (e) => {
+        console.log("Telegram Error: ", e);
+    });
+}
 
 const algerianStates = [
     "01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة",
@@ -47,11 +78,11 @@ const algerianStates = [
 ];
 
 app.get('/api/settings', (req, res) => {
-    res.json(siteSettings);
+    res.json(db.siteSettings);
 });
 
 app.post('/admin/settings', (req, res) => {
-    const { whatsapp, instagram, facebook, telegram, base64Logo } = req.body;
+    const { whatsapp, instagram, facebook, telegram, telegramBotToken, base64Logo } = req.body;
     if (base64Logo) {
         try {
             const matches = base64Logo.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
@@ -60,36 +91,38 @@ app.post('/admin/settings', (req, res) => {
                 const bitmap = Buffer.from(matches[2], 'base64');
                 const filename = `logo-${Date.now()}.${ext}`;
                 fs.writeFileSync(path.join(uploadDir, filename), bitmap);
-                siteSettings.logoUrl = `/uploads/${filename}`;
+                db.siteSettings.logoUrl = `/uploads/${filename}`;
             }
         } catch (e) { console.log(e); }
     }
-    if (whatsapp) siteSettings.whatsapp = whatsapp;
-    if (instagram) siteSettings.instagram = instagram;
-    if (facebook) siteSettings.facebook = facebook;
-    if (telegram) siteSettings.telegram = telegram;
+    if (whatsapp) db.siteSettings.whatsapp = whatsapp;
+    if (instagram) db.siteSettings.instagram = instagram;
+    if (facebook) db.siteSettings.facebook = facebook;
+    if (telegram) db.siteSettings.telegram = telegram;
+    if (telegramBotToken !== undefined) db.siteSettings.telegramBotToken = telegramBotToken;
+    
+    saveDB();
     res.redirect('/admin/dashboard');
 });
 
-// تسجيل متجر جديد مع حساب مدة الصلاحية (6 أشهر)
+// تسجيل متجر جديد
 app.post('/register', (req, res) => {
     const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password } = req.body;
-    const codeIndex = activeCodes.indexOf(activationCode);
+    const codeIndex = db.activeCodes.indexOf(activationCode);
     
     if (codeIndex === -1) {
         return res.status(400).send(`<html dir="rtl" lang="ar"><body style="font-family:Tahoma; text-align:center; padding:50px;"><h2>كود التفعيل غير صالح أو مستعمل!</h2><a href="/">العودة</a></body></html>`);
     }
 
-    const slugExists = stores.find(s => s.storeSlug === storeSlug);
+    const slugExists = db.stores.find(s => s.storeSlug === storeSlug);
     if (slugExists) {
         return res.status(400).send('رابط المتجر محجوز مسبقاً.');
     }
 
-    // حساب تاريخ انتهاء الاشتراك بعد 6 أشهر من اليوم
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 6);
 
-    stores.push({ 
+    db.stores.push({ 
         activationCode, 
         storeName, 
         storeSlug, 
@@ -98,21 +131,23 @@ app.post('/register', (req, res) => {
         ownerName, 
         password,
         whatsapp: "213700000000",
+        telegramChatId: "", // معرف تيليغرام الخاص بالتاجر لتلقي الإشعارات
         logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
         products: [],
         orders: [],
-        expiryDate: expiryDate.toISOString() // حفظ تاريخ انتهاء الباقة
+        expiryDate: expiryDate.toISOString()
     });
 
-    activeCodes.splice(codeIndex, 1);
-    usedCodes.push(activationCode);
+    db.activeCodes.splice(codeIndex, 1);
+    db.usedCodes.push(activationCode);
+    saveDB();
 
     res.send(`
         <html dir="rtl" lang="ar">
         <head><meta charset="UTF-8"><title>تم الانشاء بنجاح</title></head>
         <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
             <div style="background: white; padding: 30px; border-radius: 10px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                <h2 style="color: #008060;">مبروك يا زكرياء! تم إنشاء المتجر بنجاح 🚀</h2>
+                <h2 style="color: #008060;">مبروك يا ${ownerName}! تم إنشاء المتجر بنجاح 🚀</h2>
                 <p style="margin-top: 15px;">اسم المتجر: <b>${storeName}</b></p>
                 <p style="color: #2563eb; font-size:14px; margin-top:5px;">الباقة المبدئية: 10 منتجات (صالحة لمدة 6 أشهر)</p>
                 <p style="margin-top: 10px;">رابط المتجر الكامل:</p>
@@ -158,20 +193,21 @@ app.get('/admin/dashboard', (req, res) => {
             <div class="box">
                 <h2 style="color: #008060;">لوحة تحكم مدير منصة ClickShop</h2>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-                <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات الشعار العام ومواقع التواصل</h3>
+                <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات المنصة وبوت تيليغرام العام</h3>
                 <form action="/admin/settings" method="POST">
                     <div class="form-group"><label>شعار المنصة:</label><input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('b64').value=r.result; r.readAsDataURL(this.files[0]);"><input type="hidden" name="base64Logo" id="b64"></div>
-                    <div class="form-group"><label>الواتساب:</label><input type="text" name="whatsapp" value="${siteSettings.whatsapp}"></div>
-                    <div class="form-group"><label>إنستغرام:</label><input type="text" name="instagram" value="${siteSettings.instagram}"></div>
-                    <div class="form-group"><label>فيسبوك:</label><input type="text" name="facebook" value="${siteSettings.facebook}"></div>
-                    <div class="form-group"><label>تلغرام:</label><input type="text" name="telegram" value="${siteSettings.telegram}"></div>
+                    <div class="form-group"><label>توكن بوت تيليغرام (Telegram Bot Token):</label><input type="text" name="telegramBotToken" value="${db.siteSettings.telegramBotToken || ''}" placeholder="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"></div>
+                    <div class="form-group"><label>الواتساب:</label><input type="text" name="whatsapp" value="${db.siteSettings.whatsapp}"></div>
+                    <div class="form-group"><label>إنستغرام:</label><input type="text" name="instagram" value="${db.siteSettings.instagram}"></div>
+                    <div class="form-group"><label>فيسبوك:</label><input type="text" name="facebook" value="${db.siteSettings.facebook}"></div>
+                    <div class="form-group"><label>تلغرام:</label><input type="text" name="telegram" value="${db.siteSettings.telegram}"></div>
                     <button type="submit" class="btn">حفظ الإعدادات 💾</button>
                 </form>
             </div>
             <div class="box">
-                <h3 style="color: #059669;">المتاجر المسجلة (${stores.length}):</h3>
+                <h3 style="color: #059669;">المتاجر المسجلة (${db.stores.length}):</h3>
                 <ul>
-                    ${stores.map(s => `<li><b>${s.storeName}</b> (ينتهي في: ${new Date(s.expiryDate).toLocaleDateString()}) - <a href="/store/${s.storeSlug}" target="_blank">رابط</a> | <a href="/store/${s.storeSlug}/login">التحكم</a></li>`).join('')}
+                    ${db.stores.map(s => `<li><b>${s.storeName}</b> (المالك: ${s.ownerName}) - <a href="/store/${s.storeSlug}" target="_blank">رابط</a> | <a href="/store/${s.storeSlug}/login">التحكم</a></li>`).join('')}
                 </ul>
             </div>
         </body>
@@ -202,7 +238,7 @@ app.get('/store/:slug/login', (req, res) => {
 app.post('/store/:slug/auth', (req, res) => {
     const slug = req.params.slug;
     const { password } = req.body;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     if (store && store.password === password) {
         res.redirect(`/store/${slug}/dashboard`);
     } else {
@@ -210,13 +246,11 @@ app.post('/store/:slug/auth', (req, res) => {
     }
 });
 
-// لوحة تحكم التاجر مع التحقق من انتهاء الصلاحية وسقف الـ 10 منتجات
 app.get('/store/:slug/dashboard', (req, res) => {
     const slug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     if (!store) return res.send('المتجر غير موجود');
 
-    // التحقق هل انتهت فترة الـ 6 أشهر؟
     const isExpired = new Date() > new Date(store.expiryDate);
 
     res.send(`
@@ -241,18 +275,22 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <img src="${store.logoUrl}" class="logo-preview">
                     لوحة تحكم متجر: ${store.storeName}
                 </h2>
-                <p style="text-align:center; font-size:13px; color:#555;">تاريخ انتهاء الاشتراك: <b>${new Date(store.expiryDate).toLocaleDateString()}</b></p>
+                <p style="text-align:center; font-size:13px; color:#555;">المالك: <b>${store.ownerName}</b> | انتهاء الاشتراك: <b>${new Date(store.expiryDate).toLocaleDateString()}</b></p>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
                 
                 ${isExpired ? `
                     <div class="alert-expired">
-                        ⚠️ انتهت صلاحية اشتراك متجرك (6 أشهر)! يرجى التواصل مع الإدارة لتجديد الباقة واستئناف إضافة المنتجات.
+                        ⚠️ انتهت صلاحية اشتراك متجرك (6 أشهر)! يرجى التواصل مع الإدارة لتجديد الباقة.
                     </div>
                 ` : `
-                    <h3>إعدادات المتجر (واتساب والشعار)</h3>
+                    <h3>إعدادات المتجر (واتساب، تيليغرام للإشعارات والشعار)</h3>
                     <form action="/store/${slug}/update-settings" method="POST">
                         <label style="font-size:12px; font-weight:bold;">رقم الواتساب الخاص بك:</label>
                         <input type="text" name="whatsapp" value="${store.whatsapp}" required>
+                        
+                        <label style="font-size:12px; font-weight:bold;">معرف تيليغرام (Telegram Chat ID) لتلقي الطلبات فوراً:</label>
+                        <input type="text" name="telegramChatId" value="${store.telegramChatId || ''}" placeholder="مثال: 123456789">
+                        
                         <label style="font-size:12px; font-weight:bold;">تغيير الشعار:</label>
                         <input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('logoB64').value=r.result; r.readAsDataURL(this.files[0]);">
                         <input type="hidden" name="logoB64" id="logoB64">
@@ -261,7 +299,7 @@ app.get('/store/:slug/dashboard', (req, res) => {
 
                     <h3 style="margin-top: 25px;">إضافة منتج جديد (العدد الحالي: ${store.products.length} / 10 بحد أقصى)</h3>
                     ${store.products.length >= 10 ? `
-                        <p style="color: #dc2626; font-weight: bold; text-align: center;">لقد وصلت للحد الأقصى للباقة (10 منتجات). قم بحذف منتج لإضافة غيره أو تواصل لترقية الباقة.</p>
+                        <p style="color: #dc2626; font-weight: bold; text-align: center;">لقد وصلت للحد الأقصى للباقة (10 منتجات).</p>
                     ` : `
                         <form action="/store/${slug}/add-product" method="POST">
                             <input type="text" name="productName" placeholder="اسم المنتج" required>
@@ -316,10 +354,11 @@ app.get('/store/:slug/dashboard', (req, res) => {
 
 app.post('/store/:slug/update-settings', (req, res) => {
     const slug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === slug);
-    const { whatsapp, logoB64 } = req.body;
+    const store = db.stores.find(s => s.storeSlug === slug);
+    const { whatsapp, telegramChatId, logoB64 } = req.body;
     if (store) {
         if (whatsapp) store.whatsapp = whatsapp;
+        if (telegramChatId !== undefined) store.telegramChatId = telegramChatId;
         if (logoB64) {
             try {
                 const matches = logoB64.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
@@ -332,14 +371,14 @@ app.post('/store/:slug/update-settings', (req, res) => {
                 }
             } catch (e) { console.log(e); }
         }
+        saveDB();
     }
     res.redirect(`/store/${slug}/dashboard`);
 });
 
-// إضافة منتج مع التحقق من سقف الـ 10 منتجات وصلاحية الـ 6 أشهر
 app.post('/store/:slug/add-product', (req, res) => {
     const slug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     if (!store) return res.send('المتجر غير موجود');
 
     const isExpired = new Date() > new Date(store.expiryDate);
@@ -350,23 +389,25 @@ app.post('/store/:slug/add-product', (req, res) => {
     const { productName, productPrice, sizeType } = req.body;
     if (productName && productPrice) {
         store.products.push({ name: productName, price: productPrice, sizeType: sizeType || 'none' });
+        saveDB();
     }
     res.redirect(`/store/${slug}/dashboard`);
 });
 
 app.post('/store/:slug/delete-product', (req, res) => {
     const slug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     const { productIndex } = req.body;
     if (store && productIndex !== undefined) {
         store.products.splice(parseInt(productIndex), 1);
+        saveDB();
     }
     res.redirect(`/store/${slug}/dashboard`);
 });
 
 app.get('/store/:slug/print-order/:trackingId', (req, res) => {
     const { slug, trackingId } = req.params;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     if (!store) return res.send('المتجر غير موجود');
     const order = store.orders.find(o => o.trackingId === trackingId);
     if (!order) return res.send('الطلب غير موجود');
@@ -405,13 +446,27 @@ app.get('/store/:slug/print-order/:trackingId', (req, res) => {
 
 app.post('/store/:slug/checkout', (req, res) => {
     const slug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === slug);
+    const store = db.stores.find(s => s.storeSlug === slug);
     if (!store) return res.send('المتجر غير موجود');
 
     const { productName, price, firstName, lastName, phone, state, color, size, type } = req.body;
     const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
 
-    store.orders.push({ trackingId, productName, price, firstName, lastName, phone, state, color, size, type });
+    const newOrder = { trackingId, productName, price, firstName, lastName, phone, state, color, size, type };
+    store.orders.push(newOrder);
+    saveDB();
+
+    // إرسال إشعار فوري أوتوماتيكي عبر تيليغرام للتاجر إذا كان مسجلاً معرفه
+    if (store.telegramChatId) {
+        const tgMsg = `🚨 *طلب جديد في متجرك (${store.storeName})!*\\n\\n` +
+                      `📦 التتبع: \`#${trackingId}\`\\n` +
+                      `👤 الزبون: ${firstName} ${lastName}\\n` +
+                      `📞 الهاتف: ${phone}\\n` +
+                      `📍 الولاية: ${state}\\n` +
+                      `🛍️ المنتج: ${productName} (${price}دج)\\n` +
+                      `🎨 اللون: ${color} | المقاس: ${size}`;
+        sendTelegramNotification(store.telegramChatId, tgMsg);
+    }
 
     const whatsappMsg = `السلام عليكم، أود تأكيد طلبي:%0A- رقم التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName} (${price}دج)%0A- اللون: ${color}%0A- القياس: ${size}`;
     
@@ -435,7 +490,7 @@ app.post('/store/:slug/checkout', (req, res) => {
 
 app.get('/store/:slug', (req, res) => {
     const storeSlug = req.params.slug;
-    const store = stores.find(s => s.storeSlug === storeSlug);
+    const store = db.stores.find(s => s.storeSlug === storeSlug);
     if (!store) return res.status(404).send('المتجر غير موجود');
 
     res.send(`
