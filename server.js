@@ -38,6 +38,21 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
+// دالة إرسال إشعار تيليغرام أوتوماتيكي للتاجر
+async function sendTelegramNotification(chatId, message) {
+    if (!chatId || !db.siteSettings.telegramBotToken) return;
+    try {
+        const fetch = (await import('node-fetch')).default;
+        await fetch(`https://api.telegram.org/bot${db.siteSettings.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' })
+        });
+    } catch (e) {
+        console.error("Telegram error:", e);
+    }
+}
+
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة", "59. تيزي وزو", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"];
 
 const storeColors = [
@@ -58,18 +73,14 @@ const storeColors = [
 app.get('/', (req, res) => {
     res.send(`
         <html dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <title>ClickShop</title>
-        </head>
+        <head><meta charset="UTF-8"><title>ClickShop</title></head>
         <body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center; margin:0;">
-            <div style="background:#fff; padding:40px; max-width:450px; margin:40px auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center;">
-                <h1 style="color:#008060; margin-bottom:10px; cursor:pointer;" onclick="window.location.href='/admin-login'" title="لوحة تحكم المدير العام">🛒 منصة ClickShop</h1>
+            <div style="background:#fff; padding:40px; max-width:450px; margin:40px auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+                <h1 style="color:#008060; margin-bottom:10px; cursor:pointer;" onclick="window.location.href='/admin-login'">🛒 منصة ClickShop</h1>
                 <p style="color:#666; margin-bottom:30px;">أنشئ متجرك الإلكتروني بكل سهولة وقم بإدارة أعمالك باحترافية</p>
-                
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; box-shadow:0 2px 5px rgba(0,128,96,0.2);">إنشاء متجر جديد 🚀</a>
-                    <a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; box-shadow:0 2px 5px rgba(37,99,235,0.2);">تسجيل دخول التجار ⚙️</a>
+                    <a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold;">إنشاء متجر جديد 🚀</a>
+                    <a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold;">تسجيل دخول التجار ⚙️</a>
                 </div>
             </div>
         </body>
@@ -84,7 +95,6 @@ app.get('/admin-login', (req, res) => {
         <body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;">
             <div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px;">
                 <h2 style="color:#008060;">لوحة تحكم المدير العام</h2>
-                <p style="color:#666; font-size:13px;">أدخل كلمة المرور الخاصة بك</p>
                 <form action="/admin-auth" method="POST">
                     <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required style="width:100%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;">
                     <button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">دخول 🛠️</button>
@@ -115,7 +125,7 @@ app.get('/admin-dashboard', (req, res) => {
                 <p><b>عدد المتاجر النشطة:</b> ${db.stores.length}</p>
                 <p><b>الأكواد المفعلة:</b> ${db.activeCodes.length} كود متاح</p>
                 <h3 style="margin-top:20px;">المتاجر المسجلة:</h3>
-                ${db.stores.length === 0 ? '<p style="color:#666;">لا توجد متاجر بعد.</p>' : ''}
+                ${db.stores.length === 0 ? '<p style="color:#666;">لا توجد متاجر بعد.</p>': ''}
                 ${db.stores.map(s => `<div style="background:#f9fafb; padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b> (${s.storeSlug})</span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:12px;">زيارة المتجر</a></div>`).join('')}
                 <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; margin-top:20px;">← تسجيل الخروج للرئيسية</a>
             </div>
@@ -134,27 +144,24 @@ app.get('/register-page', (req, res) => {
                 <form action="/register" method="POST">
                     <label>كود التفعيل (8 خانات):</label>
                     <input type="text" name="activationCode" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
                     <label>اسم المتجر:</label>
                     <input type="text" name="storeName" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
                     <label>رابط المتجر (Slug بالإنجليزية):</label>
                     <input type="text" name="storeSlug" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
                     <label>مجال المتجر:</label>
                     <input type="text" name="storeCategory" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
-                    <label>لون واجهة المتجر (12 لوناً):</label>
+                    <label>لون واجهة المتجر:</label>
                     <select name="storeColor" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
                         ${storeColors.map(c => `<option value="${c.code}">${c.name}</option>`).join('')}
                     </select>
-                    
                     <label>اسم المالك:</label>
                     <input type="text" name="ownerName" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
+                    <label>رقم واتساب:</label>
+                    <input type="text" name="whatsapp" value="213700000000" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
+                    <label>معرف تيليغرام (Chat ID للاستشعارات):</label>
+                    <input type="text" name="telegramChatId" placeholder="اختياري للتنبيهات الفورية" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
                     <label>كلمة المرور:</label>
                     <input type="password" name="password" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    
                     <button type="submit" style="background:#008060; color:#fff; border:none; padding:12px; width:100%; font-weight:bold; border-radius:5px; cursor:pointer; margin-top:15px;">إنشاء المتجر 🚀</button>
                 </form>
                 <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a>
@@ -164,21 +171,21 @@ app.get('/register-page', (req, res) => {
     `);
 });
 
-app.get('/login-store', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
-});
-
 app.post('/register', (req, res) => {
-    const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password } = req.body;
+    const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, whatsapp, telegramChatId, password } = req.body;
     const idx = db.activeCodes.indexOf(activationCode);
     if (idx === -1) return res.send('كود التفعيل غير صالح أو مستعمل! <a href="/register-page">عودة</a>');
     if (db.stores.find(s => s.storeSlug === storeSlug)) return res.send('رابط المتجر محجوز مسبقاً. <a href="/register-page">عودة</a>');
     const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 6);
-    db.stores.push({ activationCode, storeName, storeSlug, storeCategory, storeColor: storeColor || '#008060', ownerName, password, whatsapp: "213700000000", telegramChatId: "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", products: [], orders: [], expiryDate: expiry.toISOString() });
+    db.stores.push({ activationCode, storeName, storeSlug, storeCategory, storeColor: storeColor || '#008060', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
     db.activeCodes.splice(idx, 1);
     db.usedCodes.push(activationCode);
     saveDB();
     res.send(`<html dir="rtl"><body style="font-family:Tahoma; text-align:center; padding:50px;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px;"><h2 style="color:#008060;">مبروك ${ownerName}! تم إنشاء المتجر 🚀</h2><a href="/store/${storeSlug}" style="display:inline-block; background:#2563eb; color:#fff; padding:10px 20px; text-decoration:none; border-radius:5px; font-weight:bold;">فتح المتجر 🛒</a><br><br><a href="/store/${storeSlug}/login" style="display:inline-block; background:#008060; color:#fff; padding:10px 20px; text-decoration:none; border-radius:5px; font-weight:bold;">لوحة التحكم ⚙️</a></div></body></html>`);
+});
+
+app.get('/login-store', (req, res) => {
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>': ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
 });
 
 app.get('/store/:slug/login', (req, res) => {
@@ -218,13 +225,20 @@ app.post('/store/:slug/delete-product', (req, res) => {
     res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
-app.post('/store/:slug/checkout', (req, res) => {
+app.post('/store/:slug/checkout', async (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
     const { productName, price, firstName, lastName, phone, state, color, size } = req.body;
     const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
     store.orders.push({ trackingId, productName, price, firstName, lastName, phone, state, color, size });
     saveDB();
+
+    // إرسال تنبيه أوتوماتيكي عبر تيليغرام إذا كان التاجر قد أدخل المعرف الخاص به
+    if (store.telegramChatId) {
+        const msg = `🛒 *طلب جديد في متجرك!*\\n- التتبع: #${trackingId}\\n- الزبون: ${firstName} ${lastName}\\n- الهاتف: ${phone}\\n- الولاية: ${state}\\n- المنتج: ${productName} (${price}دج)\\n- اللون: ${color} | المقاس: ${size}`;
+        await sendTelegramNotification(store.telegramChatId, msg);
+    }
+
     const wa = `السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName} (${price}دج)%0A- اللون: ${color}%0A- المقاس: ${size}`;
     res.send(`<html dir="rtl"><body style="font-family:Tahoma; text-align:center; padding:50px;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px;"><h2 style="color:${store.storeColor || '#008060'};">تم إرسال الطلب بنجاح!</h2><a href="https://wa.me/${store.whatsapp}?text=${wa}" style="display:inline-block; background:#25d366; color:#fff; padding:12px 20px; text-decoration:none; border-radius:5px; font-weight:bold;">تأكيد عبر واتساب التاجر 📱</a></div><script>setTimeout(()=>{window.location.href="https://wa.me/${store.whatsapp}?text=${wa}";},2000);</script></body></html>`);
 });
