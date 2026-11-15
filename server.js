@@ -49,6 +49,43 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
+// إعداد ملفات PWA ديناميكياً لتظهر في السيرفر
+app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({
+        "name": "ClickShop - منصة المتاجر الجزائرية",
+        "short_name": "ClickShop",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#f3f4f6",
+        "theme_color": "#008060",
+        "icons": [
+            {
+                "src": db.siteSettings.logoUrl,
+                "sizes": "192x192",
+                "type": "image/png"
+            },
+            {
+                "src": db.siteSettings.logoUrl,
+                "sizes": "512x512",
+                "type": "image/png"
+            }
+        ]
+    }));
+});
+
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.send(`
+        self.addEventListener('install', (e) => {
+            console.log('Service Worker Installed');
+        });
+        self.addEventListener('fetch', (e) => {
+            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+        });
+    `);
+});
+
 function sendTelegramNotification(chatId, message) {
     const token = db.siteSettings.telegramBotToken;
     if (!token || !chatId) return;
@@ -149,7 +186,10 @@ app.post('/register', (req, res) => {
 
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>تم الانشاء بنجاح</title></head>
+        <head>
+            <meta charset="UTF-8"><title>تم الانشاء بنجاح</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
             <div style="background: white; padding: 30px; border-radius: 10px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <h2 style="color: #008060;">مبروك يا ${ownerName}! تم إنشاء المتجر بنجاح 🚀</h2>
@@ -181,7 +221,10 @@ app.post('/admin/login', (req, res) => {
 app.get('/admin/dashboard', (req, res) => {
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>لوحة تحكم المنصة</title>
+        <head>
+            <meta charset="UTF-8"><title>لوحة تحكم المنصة</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <style>
             body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
             .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
@@ -238,7 +281,10 @@ app.get('/store/:slug/login', (req, res) => {
     const slug = req.params.slug;
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>تسجيل دخول التاجر</title>
+        <head>
+            <meta charset="UTF-8"><title>تسجيل دخول التاجر</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <style>body{font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;} .card{background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}</style>
         </head>
         <body>
@@ -274,7 +320,10 @@ app.get('/store/:slug/dashboard', (req, res) => {
 
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title>
+        <head>
+            <meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <style>
             body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
             .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 700px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
@@ -433,7 +482,10 @@ app.get('/store/:slug/print-order/:trackingId', (req, res) => {
 
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>بوليصة شحن - #${order.trackingId}</title>
+        <head>
+            <meta charset="UTF-8"><title>بوليصة شحن - #${order.trackingId}</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <style>
             body { font-family: Tahoma; padding: 20px; text-align: center; background: #fff; color: #000; }
             .invoice { border: 2px dashed #000; padding: 20px; max-width: 400px; margin: auto; text-align: right; }
@@ -490,7 +542,10 @@ app.post('/store/:slug/checkout', (req, res) => {
     
     res.send(`
         <html dir="rtl" lang="ar">
-        <head><meta charset="UTF-8"><title>تم إرسال الطلب</title></head>
+        <head>
+            <meta charset="UTF-8"><title>تم إرسال الطلب</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
         <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
             <div style="background: white; padding: 30px; border-radius: 10px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <h2 style="color: #008060;">تم إرسال طلبك بنجاح! 🎉</h2>
@@ -516,6 +571,7 @@ app.get('/store/:slug', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <title>${store.storeName}</title>
+            <link rel="manifest" href="/manifest.json">
             <style>
                 body { font-family: Tahoma; background: #f9fafb; margin: 0; padding: 0; text-align: center; }
                 header { background: ${store.storeColor.includes('أسود') ? '#111' : store.storeColor.includes('أزرق') ? '#1e3a8a' : store.storeColor.includes('أحمر') ? '#b91c1c' : '#008060'}; color: white; padding: 30px; display: flex; align-items: center; justify-content: center; gap: 15px; }
@@ -582,6 +638,11 @@ app.get('/store/:slug', (req, res) => {
             </div>
 
             <script>
+                // تسجيل الـ Service Worker ليعمل التطبيق في الخلفية
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').then(() => console.log('SW Registered'));
+                }
+
                 function openCheckout(name, price, sizeType) {
                     document.getElementById('modalProductName').value = name;
                     document.getElementById('modalProductPrice').value = price;
