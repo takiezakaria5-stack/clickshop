@@ -44,14 +44,24 @@ let db = {
     usedCodes: []
 };
 
+// تحميل البيانات بقراءة آمنة ومستقرة
 if (fs.existsSync(DB_FILE)) {
     try {
-        db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    } catch (e) {}
+        const fileData = fs.readFileSync(DB_FILE, 'utf8');
+        if (fileData.trim() !== '') {
+            db = JSON.parse(fileData);
+        }
+    } catch (e) {
+        console.error("Error reading database.json:", e);
+    }
 }
 
 function saveDB() {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+    try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf8');
+    } catch (e) {
+        console.error("Error saving database.json:", e);
+    }
 }
 
 async function sendTelegramNotification(chatId, message) {
@@ -200,7 +210,7 @@ function renderLayout(title, content, extraHead = '') {
                 if(l==='fr'){
                     t1.innerText="Créez votre boutique pro en secondes";
                     t2.innerText="Comment fonctionne ClickShop ?";
-                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de your boutique, recevoir les commandes instantanément via Telegram et WhatsApp !";
+                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de votre boutique, recevoir les commandes instantanément via Telegram et WhatsApp !";
                     b1.innerText="🚀 Créer ma nouvelle boutique";
                     b2.innerText="⚙️ Connexion Marchand";
                 }else if(l==='en'){
@@ -449,7 +459,7 @@ app.post('/register', (req, res) => {
     if (db.stores.find(s => s.storeSlug === storeSlug.trim())) return res.send(renderLayout('خطأ', '<div style="padding:20px;"><div class="card-box" style="text-align:center;"><h3 style="color:red; font-size:16px;">رابط المتجر محجوز مسبقاً!</h3><a href="/register-page" class="btn btn-green">عودة</a></div></div>'));
     
     const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 6);
-    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#1b2a4a', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, defaultShippingPrice: 500, products: [], orders: [], expiryDate: expiry.toISOString() });
+    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#1b2a4a', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", defaultShippingPrice: 500, password, products: [], orders: [], expiryDate: expiry.toISOString() });
     db.activeCodes.splice(idx, 1);
     db.usedCodes.push(activationCode.trim());
     saveDB();
@@ -516,7 +526,7 @@ app.get('/store/:slug/login', (req, res) => {
 app.post('/store/:slug/auth', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.password === req.body.password) {
-        res.redirect(`/store/${req.params.slug}/dashboard`);
+        res.redirect(`/store/${store.storeSlug}/dashboard`);
     } else {
         res.send(`<script>alert('كلمة المرور خطأ!'); window.location.href='/store/${req.params.slug}/login';</script>`);
     }
@@ -562,7 +572,7 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <textarea name="productDesc" rows="3" placeholder="اكتب وصفاً جذاباً للمنتج..." required></textarea>
                     <label>صور المنتج (يمكنك اختيار حتى 10 صور من معرض الهاتف):</label>
                     <input type="file" name="productImages" accept="image/*" multiple required style="background:#fff;">
-                    <label>الأنواع / الألوان المتاحة (افصل بينها بفاصلة أو نقطة عربية):</label>
+                    <label>الأنواع / الألوان المتاحة (افصل بينها بفاصلة):</label>
                     <input type="text" name="colors" placeholder="أحمر، أبيض، أسود">
                     <label>المقاسات المتاحة (اختياري، افصل بينها بفاصلة):</label>
                     <input type="text" name="sizes" placeholder="S, M, L">
@@ -631,7 +641,7 @@ app.post('/store/:slug/add-product', upload.array('productImages', 10), (req, re
         });
         saveDB();
     }
-    res.redirect(`/store/${req.params.slug}/dashboard`);
+    res.redirect(`/store/${store.storeSlug}/dashboard`);
 });
 
 app.post('/store/:slug/delete-product', (req, res) => {
@@ -640,7 +650,7 @@ app.post('/store/:slug/delete-product', (req, res) => {
         store.products.splice(parseInt(req.body.productIndex), 1);
         saveDB();
     }
-    res.redirect(`/store/${req.params.slug}/dashboard`);
+    res.redirect(`/store/${store.storeSlug}/dashboard`);
 });
 
 app.post('/store/:slug/checkout', async (req, res) => {
@@ -875,6 +885,10 @@ app.get('/store/:slug', (req, res) => {
                     }
 
                     document.getElementById('m').style.display='flex';
+                }
+
+                function calculateTest(){
+                    // دالة حسابية مساعدة لتجنب أي أخطاء في الـ DOM
                 }
 
                 function calculateTotal(){
