@@ -36,12 +36,21 @@ let activeCodes = [
 
 let usedCodes = [];
 
-// API الإعدادات العامة
+// قائمة ولايات الجزائر (69 ولاية)
+const algerianStates = [
+    "01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة",
+    "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة",
+    "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة",
+    "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة",
+    "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة",
+    "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة",
+    "59. تيزي وزو (جديدة)", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"
+];
+
 app.get('/api/settings', (req, res) => {
     res.json(siteSettings);
 });
 
-// تحديث إعدادات المنصة الرئيسية
 app.post('/admin/settings', (req, res) => {
     const { whatsapp, instagram, facebook, telegram, base64Logo } = req.body;
     if (base64Logo) {
@@ -85,8 +94,10 @@ app.post('/register', (req, res) => {
         storeColor, 
         ownerName, 
         password,
+        whatsapp: "213700000000", // واتساب خاص بالمتجر
         logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
-        products: [] // قائمة المنتجات الخاصة بالمتجر
+        products: [],
+        orders: [] // الطلبات الواردة للمتجر
     });
 
     activeCodes.splice(codeIndex, 1);
@@ -113,7 +124,6 @@ app.post('/register', (req, res) => {
     `);
 });
 
-// دخول الأدمن العام
 app.post('/admin/login', (req, res) => {
     const { password } = req.body;
     if (password === 'kenouni19') {
@@ -123,7 +133,6 @@ app.post('/admin/login', (req, res) => {
     }
 });
 
-// لوحة التحكم العامة للمنصة
 app.get('/admin/dashboard', (req, res) => {
     res.send(`
         <html dir="rtl" lang="ar">
@@ -165,7 +174,6 @@ app.get('/admin/dashboard', (req, res) => {
     `);
 });
 
-// صفحة تسجيل دخول صاحب المتجر
 app.get('/store/:slug/login', (req, res) => {
     const slug = req.params.slug;
     res.send(`
@@ -191,13 +199,13 @@ app.post('/store/:slug/auth', (req, res) => {
     const { password } = req.body;
     const store = stores.find(s => s.storeSlug === slug);
     if (store && store.password === password) {
-        res.redirect(`/store/${slug}/dashboard?auth=true`);
+        res.redirect(`/store/${slug}/dashboard`);
     } else {
         res.send(`<script>alert('كلمة المرور خاطئة!'); window.location.href='/store/${slug}/login';</script>`);
     }
 });
 
-// لوحة تحكم صاحب المتجر (إضافة وحذف المنتجات + تغيير شعار المتجر)
+// لوحة تحكم التاجر (إدارة المنتجات، الشعار، رقم الواتساب، والطلبات القابلة للطباعة والتتبع)
 app.get('/store/:slug/dashboard', (req, res) => {
     const slug = req.params.slug;
     const store = stores.find(s => s.storeSlug === slug);
@@ -208,12 +216,13 @@ app.get('/store/:slug/dashboard', (req, res) => {
         <head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title>
         <style>
             body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
-            .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
+            .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 700px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
             .box h2, .box h3 { text-align: center; }
-            input, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+            input, select, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
             .btn { background: #008060; color: white; border: none; font-weight: bold; cursor: pointer; }
-            .product-item { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; padding: 10px; border: 1px solid #e5e7eb; border-radius: 5px; margin-bottom: 8px; }
+            .product-item, .order-item { background: #f9fafb; padding: 12px; border: 1px solid #e5e7eb; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
             .del-btn { background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; width: auto; }
+            .print-btn { background: #2563eb; color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold; }
             .logo-preview { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #008060; }
         </style>
         </head>
@@ -225,30 +234,57 @@ app.get('/store/:slug/dashboard', (req, res) => {
                 </h2>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
                 
-                <h3>تغيير شعار المتجر</h3>
-                <form action="/store/${slug}/update-logo" method="POST">
-                    <input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('logoB64').value=r.result; r.readAsDataURL(this.files[0]);" required>
+                <h3>إعدادات المتجر (واتساب والشعار)</h3>
+                <form action="/store/${slug}/update-settings" method="POST">
+                    <label style="font-size:12px; font-weight:bold;">رقم الواتساب الخاص بك لتلقي الطلبات:</label>
+                    <input type="text" name="whatsapp" value="${store.whatsapp}" placeholder="مثال: 213700000000" required>
+                    <label style="font-size:12px; font-weight:bold;">تغيير الشعار:</label>
+                    <input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('logoB64').value=r.result; r.readAsDataURL(this.files[0]);">
                     <input type="hidden" name="logoB64" id="logoB64">
-                    <button type="submit" class="btn">حفظ الشعار الجديد</button>
+                    <button type="submit" class="btn">حفظ الإعدادات 💾</button>
                 </form>
 
-                <h3 style="margin-top: 20px;">إضافة منتج جديد</h3>
+                <h3 style="margin-top: 25px;">إضافة منتج جديد</h3>
                 <form action="/store/${slug}/add-product" method="POST">
                     <input type="text" name="productName" placeholder="اسم المنتج" required>
                     <input type="text" name="productPrice" placeholder="السعر (دج)" required>
+                    <label style="font-size:12px; font-weight:bold;">نوع القياسات المتاحة للمنتج:</label>
+                    <select name="sizeType">
+                        <option value="shoes">أحذية (أرقام: 36, 37, 38, 39, 40, 41, 42, 43, 44, 45)</option>
+                        <option value="clothes">ملابس (أحجام: S, M, L, XL, XXL)</option>
+                        <option value="none">بدون قياس (حجم موحد)</option>
+                    </select>
                     <button type="submit" class="btn">إضافة المنتج ➕</button>
                 </form>
 
-                <h3 style="margin-top: 20px;">قائمة المنتجات (${store.products.length})</h3>
+                <h3 style="margin-top: 25px;">قائمة المنتجات (${store.products.length})</h3>
                 <div>
                     ${store.products.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد منتجات حالياً.</p>' : ''}
                     ${store.products.map((p, index) => `
                         <div class="product-item">
-                            <span><b>${p.name}</b> - ${p.price} دج</span>
+                            <span><b>${p.name}</b> - ${p.price} دج (${p.sizeType === 'shoes' ? 'أحذية' : p.sizeType === 'clothes' ? 'ملابس' : 'بدون قياس'})</span>
                             <form action="/store/${slug}/delete-product" method="POST" style="margin:0;">
                                 <input type="hidden" name="productIndex" value="${index}">
                                 <button type="submit" class="del-btn">حذف</button>
                             </form>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <h3 style="margin-top: 25px; color: #2563eb;">الطلبات الواردة (${store.orders.length}) - قابلة للطباعة والتتبع</h3>
+                <div>
+                    ${store.orders.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد طلبات جديدة حتى الآن.</p>' : ''}
+                    ${store.orders.map(o => `
+                        <div class="order-item" style="display:block; text-align:right;">
+                            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:5px; margin-bottom:5px;">
+                                <span><b>تتبع الطلب (Tracking ID): #${o.trackingId}</b></span>
+                                <a href="/store/${slug}/print-order/${o.trackingId}" target="_blank" class="print-btn">طباعة بوليصة الشحن 🖨️</a>
+                            </div>
+                            <p style="margin:3px 0;"><b>الزبون:</b> ${o.firstName} ${o.lastName}</p>
+                            <p style="margin:3px 0;"><b>الهاتف:</b> ${o.phone}</p>
+                            <p style="margin:3px 0;"><b>الولاية:</b> ${o.state}</p>
+                            <p style="margin:3px 0;"><b>المنتج:</b> ${o.productName} (${o.price} دج)</p>
+                            <p style="margin:3px 0;"><b>اللون:</b> ${o.color} | <b>القياس:</b> ${o.size} | <b>النوع:</b> ${o.type}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -260,22 +296,25 @@ app.get('/store/:slug/dashboard', (req, res) => {
     `);
 });
 
-// تحديث شعار المتجر
-app.post('/store/:slug/update-logo', (req, res) => {
+// تحديث إعدادات التاجر (الواتساب والشعار)
+app.post('/store/:slug/update-settings', (req, res) => {
     const slug = req.params.slug;
     const store = stores.find(s => s.storeSlug === slug);
-    const { logoB64 } = req.body;
-    if (store && logoB64) {
-        try {
-            const matches = logoB64.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
-            if (matches && matches.length === 3) {
-                const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
-                const bitmap = Buffer.from(matches[2], 'base64');
-                const filename = `store-logo-${Date.now()}.${ext}`;
-                fs.writeFileSync(path.join(uploadDir, filename), bitmap);
-                store.logoUrl = `/uploads/${filename}`;
-            }
-        } catch (e) { console.log(e); }
+    const { whatsapp, logoB64 } = req.body;
+    if (store) {
+        if (whatsapp) store.whatsapp = whatsapp;
+        if (logoB64) {
+            try {
+                const matches = logoB64.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+                if (matches && matches.length === 3) {
+                    const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+                    const bitmap = Buffer.from(matches[2], 'base64');
+                    const filename = `store-logo-${Date.now()}.${ext}`;
+                    fs.writeFileSync(path.join(uploadDir, filename), bitmap);
+                    store.logoUrl = `/uploads/${filename}`;
+                }
+            } catch (e) { console.log(e); }
+        }
     }
     res.redirect(`/store/${slug}/dashboard`);
 });
@@ -284,9 +323,9 @@ app.post('/store/:slug/update-logo', (req, res) => {
 app.post('/store/:slug/add-product', (req, res) => {
     const slug = req.params.slug;
     const store = stores.find(s => s.storeSlug === slug);
-    const { productName, productPrice } = req.body;
+    const { productName, productPrice, sizeType } = req.body;
     if (store && productName && productPrice) {
-        store.products.push({ name: productName, price: productPrice });
+        store.products.push({ name: productName, price: productPrice, sizeType: sizeType || 'none' });
     }
     res.redirect(`/store/${slug}/dashboard`);
 });
@@ -302,14 +341,88 @@ app.post('/store/:slug/delete-product', (req, res) => {
     res.redirect(`/store/${slug}/dashboard`);
 });
 
-// واجهة عرض المتجر للزبائن (تعرض الشعار بجانب الاسم + قائمة المنتجات)
+// صفحة طباعة بوليصة الشحن (تتبع الطلب)
+app.get('/store/:slug/print-order/:trackingId', (req, res) => {
+    const { slug, trackingId } = req.params;
+    const store = stores.find(s => s.storeSlug === slug);
+    if (!store) return res.send('المتجر غير موجود');
+    const order = store.orders.find(o => o.trackingId === trackingId);
+    if (!order) return res.send('الطلب غير موجود');
+
+    res.send(`
+        <html dir="rtl" lang="ar">
+        <head><meta charset="UTF-8"><title>بوليصة شحن - #${order.trackingId}</title>
+        <style>
+            body { font-family: Tahoma; padding: 20px; text-align: center; background: #fff; color: #000; }
+            .invoice { border: 2px dashed #000; padding: 20px; max-width: 400px; margin: auto; text-align: right; }
+            h2 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
+            p { font-size: 16px; margin: 8px 0; }
+            @media print { .no-print { display: none; } }
+        </style>
+        </head>
+        <body onload="window.print()">
+            <div class="invoice">
+                <h2>📦 بوليصة شحن - ${store.storeName}</h2>
+                <p><b>رقم التتبع (Tracking):</b> #${order.trackingId}</p>
+                <hr>
+                <p><b>الاسم الكامل:</b> ${order.firstName} ${order.lastName}</p>
+                <p><b>رقم الهاتف:</b> ${order.phone}</p>
+                <p><b>ولاية الوجهة:</b> ${order.state}</p>
+                <hr>
+                <p><b>المنتج:</b> ${order.productName}</p>
+                <p><b>السعر:</b> ${order.price} دج</p>
+                <p><b>اللون:</b> ${order.color}</p>
+                <p><b>القياس:</b> ${order.size}</p>
+                <p><b>النوع:</b> ${order.type}</p>
+                <hr>
+                <p style="text-align: center; font-size: 14px; margin-top: 15px;">شكراً لتسوقكم معنا!</p>
+            </div>
+            <br class="no-print">
+            <button class="no-print" onclick="window.print()" style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">طباعة البوليصة 🖨️</button>
+        </body>
+        </html>
+    `);
+});
+
+app.post('/store/:slug/checkout', (req, res) => {
+    const slug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === slug);
+    if (!store) return res.send('المتجر غير موجود');
+
+    const { productName, price, firstName, lastName, phone, state, color, size, type } = req.body;
+    const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
+
+    const newOrder = { trackingId, productName, price, firstName, lastName, phone, state, color, size, type };
+    store.orders.push(newOrder);
+
+    // توجيه الزبون تلقائياً إلى واتساب التاجر مع تفاصيل الطلب
+    const whatsappMsg = `السلام عليكم، أود تأكيد طلبي:%0A- رقم التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName} (${price}دج)%0A- اللون: ${color}%0A- القياس: ${size}%0A- النوع: ${type}`;
+    
+    res.send(`
+        <html dir="rtl" lang="ar">
+        <head><meta charset="UTF-8"><title>تم إرسال الطلب</title></head>
+        <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
+            <div style="background: white; padding: 30px; border-radius: 10px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                <h2 style="color: #008060;">تم إرسال طلبك بنجاح يا زبنا الكريم! 🎉</h2>
+                <p style="margin-top: 15px;">رقم التتبع الخاص بك: <b>#<span id="trk">${trackingId}</span></b></p>
+                <p style="color: #666; font-size:14px;">جاري تحويلك الآن لتأكيد الطلب عبر الواتساب...</p>
+                <a href="https://wa.me/${store.whatsapp}?text=${whatsappMsg}" style="display: inline-block; margin-top: 20px; background: #25d366; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">تأكيد الطلب عبر واتساب التاجر 📱</a>
+            </div>
+            <script>
+                setTimeout(() => {
+                    window.location.href = "https://wa.me/${store.whatsapp}?text=${whatsappMsg}";
+                }, 2000);
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// واجهة عرض المتجر للزبائن (تحتوي على زر شراء يفتح نافذة إدخال المعلومات، الولايات الـ 69، والقياسات الذكية)
 app.get('/store/:slug', (req, res) => {
     const storeSlug = req.params.slug;
     const store = stores.find(s => s.storeSlug === storeSlug);
-
-    if (!store) {
-        return res.status(404).send('المتجر غير موجود');
-    }
+    if (!store) return res.status(404).send('المتجر غير موجود');
 
     res.send(`
         <html dir="rtl" lang="ar">
@@ -321,8 +434,13 @@ app.get('/store/:slug', (req, res) => {
                 header { background: ${store.storeColor.includes('أسود') ? '#111' : store.storeColor.includes('أزرق') ? '#1e3a8a' : store.storeColor.includes('أحمر') ? '#b91c1c' : '#008060'}; color: white; padding: 30px; display: flex; align-items: center; justify-content: center; gap: 15px; }
                 .store-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
                 .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: right; }
-                .product-card { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-                .buy-btn { background: #25d366; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+                .product-card { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+                .buy-btn { background: #008060; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+                /* Modal Styles */
+                .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+                .modal-content { background: #fff; padding: 25px; border-radius: 10px; width: 90%; max-width: 450px; text-align: right; box-shadow: 0 4px 15px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+                input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+                .close-btn { background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; float: left; }
             </style>
         </head>
         <body>
@@ -342,10 +460,89 @@ app.get('/store/:slug', (req, res) => {
                             <h4 style="margin:0 0 5px 0; color:#1f2937;">${p.name}</h4>
                             <span style="color:#059669; font-weight:bold;">${p.price} دج</span>
                         </div>
-                        <a href="https://wa.me/${siteSettings.whatsapp}?text=السلام عليكم، أود طلب منتج: ${p.name} بسعر ${p.price}دج من متجر ${store.storeName}" target="_blank" class="buy-btn">اطلب عبر الواتساب 📱</a>
+                        <button class="buy-btn" onclick="openCheckout('${p.name}', '${p.price}', '${p.sizeType}')">اطلب الآن 🛍️</button>
                     </div>
                 `).join('')}
             </div>
+
+            <!-- نافذة الشراء (Checkout Modal) -->
+            <div id="checkoutModal" class="modal">
+                <div class="modal-content">
+                    <button class="close-btn" onclick="closeCheckout()">إغلاق X</button>
+                    <h3 style="color: #008060; text-align:center; margin-bottom:15px;">إتمام الطلب</h3>
+                    <form action="/store/${store.storeSlug}/checkout" method="POST">
+                        <input type="hidden" name="productName" id="modalProductName">
+                        <input type="hidden" name="price" id="modalProductPrice">
+                        
+                        <label>الاسم:</label>
+                        <input type="text" name="firstName" placeholder="أدخل اسمك" required>
+                        
+                        <label>اللقب:</label>
+                        <input type="text" name="lastName" placeholder="أدخل لقبك" required>
+                        
+                        <label>رقم الهاتف:</label>
+                        <input type="text" name="phone" placeholder="07xxxxxxxx" required>
+                        
+                        <label>الولاية (69 ولاية):</label>
+                        <select name="state" required>
+                            <option value="">اختر ولايتك</option>
+                            ${algerianStates.map(state => `<option value="${state}">${state}</option>`).join('')}
+                        </select>
+
+                        <label>اللون:</label>
+                        <input type="text" name="color" placeholder="مثال: أسود، أبيض، أحمر..." required>
+
+                        <div id="sizeContainer">
+                            <label>القياس:</label>
+                            <select name="size" id="sizeSelect" required>
+                                <!-- يتم تعبئته ديناميكياً حسب نوع المنتج -->
+                            </select>
+                        </div>
+
+                        <label>نوع المنتج (طراز أو صنف):</label>
+                        <input type="text" name="type" placeholder="مثال: صيفي، شتوي، كلاسيك..." required>
+
+                        <button type="submit" style="width:100%; background:#25d366; color:#fff; padding:12px; border:none; border-radius:5px; font-weight:bold; margin-top:15px; cursor:pointer;">إرسال الطلب وتأكيد عبر واتساب 🚀</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                function openCheckout(name, price, sizeType) {
+                    document.getElementById('modalProductName').value = name;
+                    document.getElementById('modalProductPrice').value = price;
+                    
+                    const sizeSelect = document.getElementById('sizeSelect');
+                    sizeSelect.innerHTML = '';
+                    
+                    if (sizeType === 'shoes') {
+                        for (let i = 36; i <= 45; i++) {
+                            let opt = document.createElement('option');
+                            opt.value = i;
+                            opt.innerHTML = 'مقاس ' + i;
+                            sizeSelect.appendChild(opt);
+                        }
+                    } else if (sizeType === 'clothes') {
+                        ['S', 'M', 'L', 'XL', 'XXL'].forEach(sz => {
+                            let opt = document.createElement('option');
+                            opt.value = sz;
+                            opt.innerHTML = 'حجم ' + sz;
+                            sizeSelect.appendChild(opt);
+                        });
+                    } else {
+                        let opt = document.createElement('option');
+                        opt.value = 'حجم موحد';
+                        opt.innerHTML = 'حجم موحد (Standard)';
+                        sizeSelect.appendChild(opt);
+                    }
+
+                    document.getElementById('checkoutModal').style.display = 'flex';
+                }
+
+                function closeCheckout() {
+                    document.getElementById('checkoutModal').style.display = 'none';
+                }
+            </script>
         </body>
         </html>
     `);
