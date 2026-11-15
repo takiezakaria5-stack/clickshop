@@ -17,9 +17,12 @@ if (!fs.existsSync(uploadDir)){
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => { cb(null, uploadDir); },
-    filename: (req, file, cb) => { cb(null, Date.now() + path.extname(file.originalname)); }
+    filename: (req, file, cb) => { cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname)); }
 });
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 15 * 1024 * 1024 } 
+});
 
 const DB_FILE = path.join(__dirname, 'database.json');
 
@@ -76,7 +79,6 @@ const storeColors = [
     { name: "تبغي", code: "#8c6239" }
 ];
 
-// توليد ملف Manifest ديناميكياً لدعم الـ PWA
 app.get('/manifest.json', (req, res) => {
     res.json({
         name: "ClickShop Pro",
@@ -86,33 +88,18 @@ app.get('/manifest.json', (req, res) => {
         background_color: "#1b2a4a",
         theme_color: "#1b2a4a",
         icons: [
-            {
-                src: db.siteSettings.logoUrl,
-                sizes: "192x192",
-                type: "image/png"
-            },
-            {
-                src: db.siteSettings.logoUrl,
-                sizes: "512x512",
-                type: "image/png"
-            }
+            { src: db.siteSettings.logoUrl, sizes: "192x192", type: "image/png" },
+            { src: db.siteSettings.logoUrl, sizes: "512x512", type: "image/png" }
         ]
     });
 });
 
-// ملف Service Worker لتمكين عمل التطبيق أوفلاين وتثبيته
 app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
     res.send(`
-        self.addEventListener('install', (e) => {
-            e.waitUntil(self.skipWaiting());
-        });
-        self.addEventListener('activate', (e) => {
-            e.clients.claim();
-        });
-        self.addEventListener('fetch', (e) => {
-            e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
-        });
+        self.addEventListener('install', (e) => { e.waitUntil(self.skipWaiting()); });
+        self.addEventListener('activate', (e) => { e.clients.claim(); });
+        self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });
     `);
 });
 
@@ -529,7 +516,7 @@ app.get('/store/:slug/login', (req, res) => {
 app.post('/store/:slug/auth', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.password === req.body.password) {
-        res.redirect(`/store/${store.storeSlug}/dashboard`);
+        res.redirect(`/store/${req.params.slug}/dashboard`);
     } else {
         res.send(`<script>alert('كلمة المرور خطأ!'); window.location.href='/store/${req.params.slug}/login';</script>`);
     }
@@ -564,7 +551,7 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <input type="text" name="productPrice" required>
                     <label>وصف المنتج وتفاصيله:</label>
                     <textarea name="productDesc" rows="3" placeholder="اكتب وصفاً جذاباً للمنتج..." required></textarea>
-                    <label>صور المنتج (يمكنك اختيار عدة صور من معرض الهاتف Gallery):</label>
+                    <label>صور المنتج (يمكنك اختيار حتى 10 صور من معرض الهاتف):</label>
                     <input type="file" name="productImages" accept="image/*" multiple required style="background:#fff;">
                     <label>الأنواع / الألوان المتاحة (من كلمة واحدة، افصل بفاصلة):</label>
                     <input type="text" name="colors" placeholder="كشميري، زيتوني، كحلي">
@@ -609,7 +596,8 @@ app.post('/store/:slug/update-logo', upload.single('storeLogoFile'), (req, res) 
     res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
-app.post('/store/:slug/add-product', upload.array('productImages', 5), (req, res) => {
+// رفع حتى 10 صور للمنتج بكل أمان بدون أخطاء
+app.post('/store/:slug/add-product', upload.array('productImages', 10), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
         let imageUrls = ["https://i.ibb.co/6P82W8h/default-avatar.png"];
