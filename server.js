@@ -77,6 +77,11 @@ const storeColors = [
 ];
 
 function renderLayout(title, content, extraHead = '') {
+    let siteLogoHTML = `<div class="logo-circle">Logo</div>`;
+    if (db.siteSettings.logoUrl && db.siteSettings.logoUrl !== "https://i.ibb.co/6P82W8h/default-avatar.png") {
+        siteLogoHTML = `<img src="${db.siteSettings.logoUrl}" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid #fff;">`;
+    }
+
     return `
     <!DOCTYPE html>
     <html dir="rtl" lang="ar">
@@ -114,7 +119,7 @@ function renderLayout(title, content, extraHead = '') {
     <body>
         <div class="navbar">
             <a href="/admin-login" class="brand" title="لوحة المدير العام">
-                <div class="logo-circle">Logo</div>
+                ${siteLogoHTML}
                 <h1>ClickShop</h1>
             </a>
             <div class="lang-dropdown">
@@ -226,6 +231,13 @@ app.get('/admin-dashboard', (req, res) => {
             <div class="card-box" style="margin:15px 0;">
                 <h2 style="color:#1b2a4a; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 
+                <h3 style="font-size:15px; color:#1b2a4a; font-weight:bold;">تخصيص شعار المنصة (Logo):</h3>
+                <form action="/admin/update-logo" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
+                    <label>اختر صورة الشعار من الهاتف (Gallery):</label>
+                    <input type="file" name="logoFile" accept="image/*" required style="margin-bottom:10px; background:#fff;">
+                    <button type="submit" class="btn" style="background:#1b2a4a; color:#fff; padding:10px;">حفظ وتحديث شعار المنصة 🖼️</button>
+                </form>
+
                 <h3 style="font-size:15px; color:#1b2a4a; font-weight:bold;">تخصيص مساحة الإعلانات:</h3>
                 <form action="/admin/update-announcement" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
                     <label>نوع الإعلان:</label>
@@ -262,6 +274,14 @@ app.get('/admin-dashboard', (req, res) => {
         </div>
     `;
     res.send(renderLayout('لوحة تحكم المدير', html));
+});
+
+app.post('/admin/update-logo', upload.single('logoFile'), (req, res) => {
+    if (req.file) {
+        db.siteSettings.logoUrl = '/uploads/' + req.file.filename;
+        saveDB();
+    }
+    res.redirect('/admin-dashboard');
 });
 
 app.post('/admin/update-announcement', upload.single('announcementImageFile'), (req, res) => {
@@ -450,6 +470,13 @@ app.get('/store/:slug/dashboard', (req, res) => {
                 <h2 style="color:${store.storeColor || '#1b2a4a'}; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
                 <hr style="border:0; border-top:1px solid #eee; margin:12px 0;">
                 
+                <h3 style="font-size:15px; margin-top:0; color:#1b2a4a; font-weight:bold;">تخصيص شعار المتجر (Logo):</h3>
+                <form action="/store/${store.storeSlug}/update-logo" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
+                    <label>اختر صورة الشعار من الهاتف (Gallery):</label>
+                    <input type="file" name="storeLogoFile" accept="image/*" required style="margin-bottom:10px; background:#fff;">
+                    <button type="submit" class="btn" style="background:${store.storeColor || '#1b2a4a'}; color:#fff; padding:10px;">حفظ وتحديث شعار المتجر 🖼️</button>
+                </form>
+
                 <h3 style="font-size:15px; margin-top:0; color:#1b2a4a; font-weight:bold;">إضافة منتج (${store.products.length}/10)</h3>
                 ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى للمنتجات.</p>' : `
                 <form action="/store/${store.storeSlug}/add-product" method="POST" enctype="multipart/form-data">
@@ -495,6 +522,15 @@ app.get('/store/:slug/dashboard', (req, res) => {
     res.send(renderLayout(`لوحة تحكم ${store.storeName}`, html));
 });
 
+app.post('/store/:slug/update-logo', upload.single('storeLogoFile'), (req, res) => {
+    const store = db.stores.find(s => s.storeSlug === req.params.slug);
+    if (store && req.file) {
+        store.logoUrl = '/uploads/' + req.file.filename;
+        saveDB();
+    }
+    res.redirect(`/store/${req.params.slug}/dashboard`);
+});
+
 app.post('/store/:slug/add-product', upload.array('productImages', 5), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
@@ -512,7 +548,7 @@ app.post('/store/:slug/add-product', upload.array('productImages', 5), (req, res
         });
         saveDB();
     }
-    res.redirect(`/store/${store.storeSlug}/dashboard`);
+    res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
 app.post('/store/:slug/delete-product', (req, res) => {
@@ -521,7 +557,7 @@ app.post('/store/:slug/delete-product', (req, res) => {
         store.products.splice(parseInt(req.body.productIndex), 1);
         saveDB();
     }
-    res.redirect(`/store/${store.storeSlug}/dashboard`);
+    res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
 app.post('/store/:slug/checkout', async (req, res) => {
@@ -563,6 +599,11 @@ app.get('/store/:slug', (req, res) => {
     if (!store) return res.status(404).send('المتجر غير موجود');
     const themeColor = store.storeColor || '#1b2a4a';
     
+    let storeLogoHTML = `<div style="background:#fff; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:${themeColor}; font-weight:bold; font-size:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15);">Logo</div>`;
+    if (store.logoUrl && store.logoUrl !== "https://i.ibb.co/6P82W8h/default-avatar.png") {
+        storeLogoHTML = `<img src="${store.logoUrl}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #fff;">`;
+    }
+
     res.send(`
         <!DOCTYPE html>
         <html dir="rtl" lang="ar">
@@ -604,7 +645,7 @@ app.get('/store/:slug', (req, res) => {
         <body>
             <header class="store-header">
                 <a href="/store/${store.storeSlug}/login" style="display:flex; align-items:center; gap:10px; text-decoration:none; color:#fff;" title="تسجيل دخول التاجر">
-                    <div style="background:#fff; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:${themeColor}; font-weight:bold; font-size:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15);">Logo</div>
+                    ${storeLogoHTML}
                     <h1 style="font-size:18px; margin:0;">🛒 ${store.storeName}</h1>
                 </a>
             </header>
@@ -632,7 +673,7 @@ app.get('/store/:slug', (req, res) => {
                             
                             <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
-                    </div>`;
+                    `;
                 }).join('')}
             </div>
 
