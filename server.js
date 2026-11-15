@@ -8,18 +8,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-// السماح بالوصول لمجلد الرفع لرؤية الصور المرفوعة
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// تأكد من وجود مجلد الرفع
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)){
-    fs.existsSync(uploadDir) || fs.mkdirSync(uploadDir, { recursive: true });
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 let stores = [];
 
-// إعدادات المنصة الافتراضية
 let siteSettings = {
     logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
     whatsapp: "213700000000",
@@ -39,15 +36,15 @@ let activeCodes = [
 
 let usedCodes = [];
 
+// API لجلب الإعدادات لواجهة الزوار
 app.get('/api/settings', (req, res) => {
     res.json(siteSettings);
 });
 
-// مسار تحديث الإعدادات (مع دعم رفع الصور مباشرة من الهاتف)
+// تحديث الإعدادات والشعار من لوحة التحكم
 app.post('/admin/settings', (req, res) => {
-    const { logoUrl, whatsapp, instagram, facebook, telegram, base64Logo } = req.body;
+    const { whatsapp, instagram, facebook, telegram, base64Logo } = req.body;
     
-    // إذا قام المستخدم باختيار صورة جديدة من الهاتف كـ Base64
     if (base64Logo) {
         try {
             const matches = base64Logo.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
@@ -61,8 +58,6 @@ app.post('/admin/settings', (req, res) => {
         } catch (e) {
             console.log("Error saving image:", e);
         }
-    } else if (logoUrl) {
-        siteSettings.logoUrl = logoUrl;
     }
 
     if (whatsapp) siteSettings.whatsapp = whatsapp;
@@ -73,6 +68,7 @@ app.post('/admin/settings', (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
+// تسجيل متجر جديد
 app.post('/register', (req, res) => {
     const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password } = req.body;
     const codeIndex = activeCodes.indexOf(activationCode);
@@ -84,7 +80,7 @@ app.post('/register', (req, res) => {
                 <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                     <h2 style="color: #dc2626;">خطأ في التفعيل!</h2>
                     <p style="margin-top: 15px;">كود التفعيل غير صالح، أو تم استخدامه من قبل.</p>
-                    <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة</a>
+                    <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة للمحاولة</a>
                 </div>
             </body>
             </html>
@@ -93,7 +89,7 @@ app.post('/register', (req, res) => {
 
     const slugExists = stores.find(s => s.storeSlug === storeSlug);
     if (slugExists) {
-        return res.status(400).send('رابط المتجر محجوز مسبقاً.');
+        return res.status(400).send('رابط المتجر (Slug) محجوز مسبقاً، اختر رابطاً آخر.');
     }
 
     stores.push({ activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password });
@@ -104,16 +100,22 @@ app.post('/register', (req, res) => {
         <html dir="rtl" lang="ar">
         <head><meta charset="UTF-8"><title>تم الانشاء بنجاح</title></head>
         <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
-            <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+            <div style="background: white; padding: 30px; border-radius: 10px; max-width: 450px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
                 <h2 style="color: #008060;">مبروك يا زكرياء! تم إنشاء المتجر بنجاح 🚀</h2>
                 <p style="margin-top: 15px;">اسم المتجر: <b>${storeName}</b></p>
-                <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة للرئيسية</a>
+                <p style="margin-top: 10px;">رابط المتجر الكامل:</p>
+                <input type="text" value="https://clickshop-b19x.onrender.com/store/${storeSlug}" readonly style="width: 100%; padding: 10px; text-align: center; font-family: monospace; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 5px; margin: 10px 0;" onclick="this.select();">
+                <br>
+                <a href="/store/${storeSlug}" target="_blank" style="display: inline-block; margin-top: 10px; background: #2563eb; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">فتح المتجر مباشرة 🛒</a>
+                <br>
+                <a href="/" style="display: inline-block; margin-top: 15px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة للرئيسية</a>
             </div>
         </body>
         </html>
     `);
 });
 
+// التحقق من كلمة مرور المشرف
 app.post('/admin/login', (req, res) => {
     const { password } = req.body;
     if (password === 'kenouni19') {
@@ -123,7 +125,7 @@ app.post('/admin/login', (req, res) => {
     }
 });
 
-// لوحة التحكم مع زر اختيار الشعار من الاستوديو (Gallery)
+// لوحة التحكم (Dashboard) النظيفة والآمنة
 app.get('/admin/dashboard', (req, res) => {
     res.send(`
         <html dir="rtl" lang="ar">
@@ -156,10 +158,10 @@ app.get('/admin/dashboard', (req, res) => {
                     <img src="${siteSettings.logoUrl}" class="preview-logo" alt="Current Logo">
                 </div>
 
-                <form action="/admin/settings" method="POST" id="settingsForm">
+                <form action="/admin/settings" method="POST">
                     <div class="form-group">
                         <label>اختر صورة الشعار من الاستوديو (Gallery):</label>
-                        <input type="file" id="imageInput" accept="image/*" onchange="convertImageToBase64(this)">
+                        <input type="file" accept="image/*" onchange="convertImageToBase64(this)">
                         <input type="hidden" name="base64Logo" id="base64Logo">
                     </div>
                     <div class="form-group">
@@ -195,7 +197,7 @@ app.get('/admin/dashboard', (req, res) => {
 
                 <h3 style="margin-top: 20px; color: #2563eb;">المتاجر المسجلة (${stores.length}):</h3>
                 <ul>
-                    ${stores.map(s => `<li><b>${s.storeName}</b> (${s.storeSlug}) - المالك: ${s.ownerName}</li>`).join('')}
+                    ${stores.map(s => `<li><b>${s.storeName}</b> (<a href="/store/${s.storeSlug}" target="_blank">/store/${s.storeSlug}</a>) - المالك: ${s.ownerName}</li>`).join('')}
                 </ul>
             </div>
 
@@ -211,6 +213,52 @@ app.get('/admin/dashboard', (req, res) => {
                     }
                 }
             </script>
+        </body>
+        </html>
+    `);
+});
+
+// مسار عرض متجر الزبون حسب الرابط (Slug)[span_1](start_span)[span_1](end_span)
+app.get('/store/:slug', (req, res) => {
+    const storeSlug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === storeSlug);
+
+    if (!store) {
+        return res.status(404).send(`
+            <html dir="rtl" lang="ar">
+            <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
+                <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <h2 style="color: #dc2626;">المتجر غير موجود!</h2>
+                    <p style="margin-top: 15px;">عذراً، هذا المتجر غير مسجل أو أن الرابط غير صحيح.</p>
+                    <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">الرئيسية</a>
+                </div>
+            </body>
+            </html>
+        `);
+    }
+
+    res.send(`
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <title>${store.storeName}</title>
+            <style>
+                body { font-family: Tahoma; background: #f9fafb; margin: 0; padding: 0; text-align: center; }
+                header { background: ${store.storeColor.includes('أسود') ? '#111' : store.storeColor.includes('أزرق') ? '#1e3a8a' : store.storeColor.includes('أحمر') ? '#b91c1c' : '#008060'}; color: white; padding: 30px; }
+                h1 { font-size: 32px; margin-bottom: 5px; }
+                p { font-size: 16px; opacity: 0.9; }
+                .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+            </style>
+        </head>
+        <body>
+            <header>
+                <h1>🛒 ${store.storeName}</h1>
+                <p>مرحباً بكم في متجرنا - المجال: ${store.storeCategory}</p>
+            </header>
+            <div class="container">
+                <h2>أهلاً بك في متجر ${store.ownerName}</h2>
+                <p style="margin-top: 20px; color: #4b5563;">المنصة قيد تجهيز المنتجات وعرض السلع... انتظرونا قريباً!</p>
+            </div>
         </body>
         </html>
     `);
