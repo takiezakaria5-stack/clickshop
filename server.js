@@ -25,9 +25,9 @@ let db = {
         announcement: "📢 مكان مخصص للإعلانات والعروض الخاصة بك هنا"
     },
     activeCodes: [
-        { code: "CS-9X4F-7B2K", createdAt: "2026-03-30 10:00" },
-        { code: "CS-3M8R-9P1W", createdAt: "2026-03-30 10:05" },
-        { code: "CS-5V2X-4H8N", createdAt: "2026-03-30 10:10" }
+        { code: "CS-9X4F-7B2K", createdAt: "2026-11-15 10:00" },
+        { code: "CS-3M8R-9P1W", createdAt: "2026-11-15 10:05" },
+        { code: "CS-5V2X-4H8N", createdAt: "2026-11-15 10:10" }
     ],
     usedCodes: []
 };
@@ -54,7 +54,7 @@ async function sendTelegramNotification(chatId, message) {
     } catch (e) {}
 }
 
-const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة", "59. تيزي وزو", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"];
+const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة"];
 
 const storeColors = [
     { name: "أخضر زمردي", code: "#008060" },
@@ -71,99 +71,109 @@ const storeColors = [
     { name: "أخضر زيتوني", code: "#4d7c0f" }
 ];
 
+function renderLayout(title, content, extraHead = '') {
+    return `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>${title}</title>
+        <style>
+            * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+            body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
+            .navbar { background: #008060; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; color: #fff; width: 100%; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+            .brand { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; color: #fff; }
+            .brand h1 { margin: 0; font-size: 18px; }
+            .logo-circle { background: #fff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 9px; }
+            .nav-actions { display: flex; gap: 8px; align-items: center; }
+            .action-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; cursor: pointer; }
+            .hero-section { background: linear-gradient(135deg, #008060 0%, #046c51 100%); color: #fff; padding: 30px 15px; text-align: center; width: 100%; }
+            .card-box { background: #fff; margin: -20px 12px 15px 12px; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); color: #111827; text-align: right; }
+            .announcement { border: 2px dashed #f59e0b; background: #fffbeb; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #b45309; font-size: 13px; font-weight: bold; text-align: center; }
+            .btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; text-align: center; }
+            .btn-green { background: #008060; color: #fff; }
+            .btn-blue { background: #2563eb; color: #fff; }
+            .btn-wa { background: #25d366; color: #fff; }
+            label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #374151; }
+            input, select { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
+            input:focus, select:focus { outline: none; border-color: #008060; }
+        </style>
+        ${extraHead}
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="brand" onclick="window.location.href='/'">
+                <div class="logo-circle">Logo</div>
+                <h1>ClickShop</h1>
+            </div>
+            <div class="nav-actions">
+                <a href="/register-page" class="action-btn" style="background:#fff; color:#008060;">أنشئ متجرك</a>
+                <a href="/login-store" class="action-btn">دخول التجار</a>
+            </div>
+        </div>
+        ${content}
+    </body>
+    </html>`;
+}
+
 app.get('/', (req, res) => {
-    res.send(`
-        <html dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>ClickShop - منصة المتاجر الإلكترونية</title>
-        </head>
-        <body style="font-family:Tahoma; background:#f3f4f6; margin:0; padding:0; text-align:center;">
-            <div style="background:#008060; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-                <div style="display:flex; gap:8px;">
-                    <button onclick="setLang('ar')" style="background:rgba(255,255,255,0.2); border:none; color:#fff; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">العربية</button>
-                    <button onclick="setLang('fr')" style="background:rgba(255,255,255,0.2); border:none; color:#fff; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">Français</button>
-                    <button onclick="setLang('en')" style="background:rgba(255,255,255,0.2); border:none; color:#fff; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:12px;">English</button>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <h1 style="margin:0; font-size:22px; cursor:pointer;" onclick="window.location.href='/admin-login'">ClickShop</h1>
-                    <div style="background:#fff; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">
-                        <span style="font-size:10px; font-weight:bold; color:#008060;">Logo</span>
-                    </div>
-                </div>
+    const html = `
+        <div class="hero-section">
+            <h1 style="font-size: 24px; margin: 0 0 10px 0; line-height: 1.4;">أطلق متجرك الإلكتروني الاحترافي في دقائق</h1>
+            <p style="font-size: 13px; margin: 0 auto; max-width: 450px; opacity: 0.9; line-height: 1.6;">منصة ClickShop تمنحك كل الأدوات اللازمة لإدارة منتجاتك، استقبال طلباتك، وتوسيع تجارتك بكل سهولة واحترافية.</p>
+            <div style="margin-top: 20px;">
+                <a href="/register-page" class="btn" style="background:#fff; color:#008060; display:inline-block; width:auto; padding:10px 25px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">ابدأ متجرك الآن 🚀</a>
+            </div>
+        </div>
+
+        <div class="card-box">
+            <div class="announcement">${db.siteSettings.announcement}</div>
+            
+            <h3 style="color:#008060; font-size:16px; margin-top:0; text-align:center;">كيف تعمل منصة ClickShop؟ ⚙️</h3>
+            <p style="font-size:13px; color:#4b5563; line-height:1.6; text-align:center; margin-bottom:20px;">
+                نحن نعمل على مدار الساعة طوال أيام الأسبوع (<b>24/7</b>) لضمان استقرار متجرك، استقبال طلبات الزبائن وتنبيهك فورياً عبر التيليغرام والواتساب، مع تحكم كامل بالهوية والألوان!
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <a href="/register-page" class="btn btn-green">🚀 ابدأ إنشاء متجرك الجديد</a>
+                <a href="/login-store" class="btn btn-blue">⚙️ لوحة تحكم التجار</a>
+                <a href="/admin-login" class="btn" style="background:#4b5563; color:#fff; font-size:13px; padding:10px;">🛠️ دخول المدير العام</a>
             </div>
 
-            <div style="max-width:480px; margin:20px auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.06);">
-                <div style="border: 2px dashed #f59e0b; background:#fffbeb; padding:12px; border-radius:8px; margin-bottom:20px; color:#b45309; font-size:13px; font-weight:bold;">
-                    ${db.siteSettings.announcement}
-                </div>
-
-                <h2 id="t1" style="color:#111827; margin-bottom:10px; font-size:22px;">أنشئ متجرك الإلكتروني الاحترافي في ثوانٍ</h2>
-                <p id="t2" style="color:#4b5563; font-size:13px; margin-bottom:20px; line-height:1.5;">منصة متكاملة لإطلاق تجارتك الذكية، بتحكم كامل في الهوية، الألوان، وبأمان تام عبر أكواد التفعيل الحصرية.</p>
-                
-                <div style="display:flex; flex-direction:column; gap:12px;">
-                    <a href="/register-page" id="b1" style="display:block; background:#008060; color:#fff; padding:12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:15px; box-shadow:0 4px 10px rgba(0,128,96,0.2);">🚀 ابدأ إنشاء متجرك الآن</a>
-                    <a href="/login-store" id="b2" style="display:block; background:#2563eb; color:#fff; padding:12px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:15px; box-shadow:0 4px 10px rgba(37,99,235,0.2);">⚙️ تسجيل دخول التجار</a>
-                </div>
-
-                <!-- أيقونات التواصل الاجتماعي الحقيقية SVG -->
-                <div style="display:flex; justify-content:center; gap:15px; margin-top:25px;">
-                    <a href="https://t.me/" target="_blank" style="background:#0088cc; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Telegram">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.06-.78 4.15-1.81 6.91-3.01 8.28-3.61 3.94-1.72 4.76-2.02 5.29-2.03.12 0 .39.03.56.17.15.12.19.28.21.4-.02.08-.02.2-.04.35z"/></svg>
-                    </a>
-                    <a href="https://facebook.com" target="_blank" style="background:#1877f2; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Facebook">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.15 6.5 13 6.5c.88 0 1.76.08 2.6.24v2.85h-1.47c-.99 0-1.3.49-1.3 1.25V12h3.02l-.48 3h-2.54v6.8c4.56-.93 8-4.96 8-9.8z"/></svg>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" style="background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Instagram">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                    </a>
-                    <a href="https://whatsapp.com" target="_blank" style="background:#25d366; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="WhatsApp">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                    </a>
-                </div>
+            <div style="display:flex; justify-content:center; gap:15px; margin-top:25px; padding-top:18px; border-top:1px solid #f3f4f6;">
+                <a href="https://t.me/" target="_blank" style="background:#0088cc; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Telegram">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.03-1.99 1.27-5.62 3.72-.53.36-1.01.54-1.44.53-.47-.02-1.38-.27-2.06-.49-.83-.27-1.49-.42-1.43-.89.03-.25.38-.51 1.06-.78 4.15-1.81 6.91-3.01 8.28-3.61 3.94-1.72 4.76-2.02 5.29-2.03.12 0 .39.03.56.17.15.12.19.28.21.4-.02.08-.02.2-.04.35z"/></svg>
+                </a>
+                <a href="https://facebook.com" target="_blank" style="background:#1877f2; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Facebook">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.15 6.5 13 6.5c.88 0 1.76.08 2.6.24v2.85h-1.47c-.99 0-1.3.49-1.3 1.25V12h3.02l-.48 3h-2.54v6.8c4.56-.93 8-4.96 8-9.8z"/></svg>
+                </a>
+                <a href="https://instagram.com" target="_blank" style="background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="Instagram">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="https://whatsapp.com" target="_blank" style="background:#25d366; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;" title="WhatsApp">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                </a>
             </div>
-            <script>
-                function setLang(l){
-                    if(l==='fr'){
-                        document.getElementById('t1').innerText="Créez votre boutique pro en secondes";
-                        document.getElementById('t2').innerText="Plateforme e-commerce intégrée avec contrôle total des couleurs et sécurité.";
-                        document.getElementById('b1').innerText="🚀 Créer ma boutique";
-                        document.getElementById('b2').innerText="⚙️ Connexion Marchand";
-                    }else if(l==='en'){
-                        document.getElementById('t1').innerText="Create your pro store in seconds";
-                        document.getElementById('t2').innerText="Integrated e-commerce platform with full color control and security.";
-                        document.getElementById('b1').innerText="🚀 Create Store Now";
-                        document.getElementById('b2').innerText="⚙️ Merchant Login";
-                    }else{
-                        document.getElementById('t1').innerText="أنشئ متجرك الإلكتروني الاحترافي في ثوانٍ";
-                        document.getElementById('t2').innerText="منصة متكاملة لإطلاق تجارتك الذكية، بتحكم كامل في الهوية، الألوان، وبأمان تام عبر أكواد التفعيل الحصرية.";
-                        document.getElementById('b1').innerText="🚀 ابدأ إنشاء متجرك الآن";
-                        document.getElementById('b2').innerText="⚙️ تسجيل دخول التجار";
-                    }
-                }
-            </script>
-        </body>
-        </html>
-    `);
+        </div>
+    `;
+    res.send(renderLayout('ClickShop - منصة المتاجر الإلكترونية', html));
 });
 
 app.get('/admin-login', (req, res) => {
-    res.send(`
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>دخول المدير العام</title></head>
-        <body style="font-family:Tahoma; background:#f3f4f6; padding:30px; text-align:center;">
-            <div style="background:#fff; padding:25px; max-width:380px; margin:auto; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <h2 style="color:#008060; font-size:18px;">لوحة تحكم المدير العام</h2>
+    const html = `
+        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
+            <div class="card-box" style="margin:20px 0;">
+                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">دخول المدير العام 🛠️</h2>
                 <form action="/admin-auth" method="POST">
-                    <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required style="width:100%; padding:9px; margin:10px 0; border:1px solid #ccc; border-radius:5px;">
-                    <button type="submit" style="width:100%; background:#008060; color:#fff; padding:9px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">دخول 🛠️</button>
+                    <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required>
+                    <button type="submit" class="btn btn-green">دخول</button>
                 </form>
-                <br><a href="/" style="color:#555; text-decoration:none; font-size:12px;">← عودة للرئيسية</a>
+                <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
             </div>
-        </body>
-        </html>
-    `);
+        </div>
+    `;
+    res.send(renderLayout('دخول المدير العام', html));
 });
 
 app.post('/admin-auth', (req, res) => {
@@ -175,39 +185,36 @@ app.post('/admin-auth', (req, res) => {
 });
 
 app.get('/admin-dashboard', (req, res) => {
-    res.send(`
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>لوحة المدير العام</title></head>
-        <body style="font-family:Tahoma; background:#f3f4f6; padding:20px; text-align:center;">
-            <div style="background:#fff; padding:25px; max-width:650px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <h2 style="color:#008060; text-align:center; font-size:18px;">لوحة تحكم مدير منصة ClickShop 🛠️</h2>
-                <hr style="border:0; border-top:1px solid #eee; margin:12px 0;">
+    const html = `
+        <div style="padding:15px; max-width:600px; margin:0 auto; width:100%;">
+            <div class="card-box" style="margin:15px 0;">
+                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 
-                <h3 style="font-size:14px; color:#333;">تحديث نص الإعلان في الواجهة:</h3>
+                <label>تحديث نص الإعلان في الواجهة:</label>
                 <form action="/admin/update-announcement" method="POST" style="margin-bottom:15px;">
-                    <input type="text" name="announcement" value="${db.siteSettings.announcement}" required style="width:100%; padding:8px; margin:4px 0 8px 0; border:1px solid #ccc; border-radius:4px; font-size:12px;">
-                    <button type="submit" style="background:#f59e0b; color:#fff; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">تحديث الإعلان 📢</button>
+                    <input type="text" name="announcement" value="${db.siteSettings.announcement}" required>
+                    <button type="submit" class="btn" style="background:#f59e0b; color:#fff; padding:10px;">تحديث الإعلان 📢</button>
                 </form>
 
-                <h3 style="font-size:14px; color:#333;">توليد كود تفعيل جديد:</h3>
+                <label>توليد كود تفعيل جديد:</label>
                 <form action="/admin/generate-code" method="POST" style="margin-bottom:15px;">
-                    <button type="submit" style="background:#008060; color:#fff; border:none; padding:8px 15px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">توليد كود تفعيل عشوائي ⚡</button>
+                    <button type="submit" class="btn btn-green" style="padding:10px;">توليد كود تفعيل عشوائي ⚡</button>
                 </form>
 
-                <p style="font-size:13px;"><b>الأكواد المتاحة (${db.activeCodes.length}):</b></p>
-                <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:15px; max-height:120px; overflow-y:auto;">
-                    ${db.activeCodes.map(c => `<div style="font-size:12px; margin-bottom:4px; display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:3px;"><span>🔑 <b>${c.code}</b></span><span style="color:#666;">التوليد: ${c.createdAt}</span></div>`).join('')}
+                <label>الأكواد المتاحة (${db.activeCodes.length}):</label>
+                <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:15px; max-height:140px; overflow-y:auto;">
+                    ${db.activeCodes.map(c => `<div style="font-size:12px; margin-bottom:5px; display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:4px;"><span>🔑 <b>${c.code}</b></span><span style="color:#6b7280;">${c.createdAt}</span></div>`).join('')}
                 </div>
 
-                <p style="font-size:13px;"><b>عدد المتاجر النشطة:</b> ${db.stores.length}</p>
-                <h3 style="font-size:14px; margin-top:12px;">المتاجر المسجلة:</h3>
-                ${db.stores.length === 0 ? '<p style="color:#666; font-size:12px;">لا توجد متاجر بعد.</p>' : ''}
-                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:12px;"><b>${s.storeName}</b> (${s.storeSlug})</span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:4px 8px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
-                <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; margin-top:12px; font-size:12px;">← تسجيل الخروج للرئيسية</a>
+                <label>المتاجر المسجلة (${db.stores.length}):</label>
+                ${db.stores.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
+                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
+                
+                <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← تسجيل الخروج للرئيسية</a>
             </div>
-        </body>
-        </html>
-    `);
+        </div>
+    `;
+    res.send(renderLayout('لوحة تحكم المدير', html));
 });
 
 app.post('/admin/update-announcement', (req, res) => {
@@ -226,100 +233,133 @@ app.post('/admin/generate-code', (req, res) => {
 });
 
 app.get('/register-page', (req, res) => {
-    res.send(`
-        <html dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <title>إنشاء متجر جديد</title>
-            <script>
-                let timeLeft = 75; // تم الضبط على 75 ثانية تماماً كما طلبت
-                function startTimer() {
-                    let timerElement = document.getElementById('timer');
-                    let interval = setInterval(() => {
-                        let minutes = Math.floor(timeLeft / 60);
-                        let seconds = timeLeft % 60;
-                        timerElement.innerText = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-                        if (timeLeft <= 0) {
-                            clearInterval(interval);
-                            timerElement.innerText = "انتهت صلاحية الجلسة!";
-                        }
-                        timeLeft--;
-                    }, 1000);
-                }
-                window.onload = startTimer;
-            </script>
-        </head>
-        <body style="font-family:Tahoma; background:#f3f4f6; padding:20px; text-align:center;">
-            <div style="background:#fff; padding:20px; max-width:420px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <h2 style="color:#008060; text-align:center; font-size:18px; margin-top:0;">نموذج تسجيل المتجر الجديد</h2>
+    const timerScript = `
+        <script>
+            let timeLeft = 75;
+            function startTimer() {
+                let timerElement = document.getElementById('timer');
+                let interval = setInterval(() => {
+                    let minutes = Math.floor(timeLeft / 60);
+                    let seconds = timeLeft % 60;
+                    timerElement.innerText = (minutes < 10 ? "0" : "") + minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        timerElement.innerText = "انتهت صلاحية الجلسة!";
+                    }
+                    timeLeft--;
+                }, 1000);
+            }
+            window.onload = startTimer;
+        </script>
+    `;
+    const html = `
+        <div style="padding:12px; max-width:500px; margin:0 auto; width:100%;">
+            <div class="card-box" style="margin:10px 0;">
+                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">بيانات متجرك الجديد</h2>
                 
-                <div style="border: 2px dashed #008060; background:#f0fdf4; padding:10px; border-radius:6px; margin-bottom:15px; text-align:center; color:#065f46; font-weight:bold; font-size:13px;">
-                    الوقت المتبقي لإدخال كود التفعيل: <span id="timer" style="color:red; font-size:15px;">01:15</span>
+                <div style="border: 2px solid #008060; background:#f0fdf4; padding:10px; border-radius:8px; margin-bottom:15px; text-align:center; color:#065f46; font-weight:bold; font-size:13px;">
+                    الوقت المتبقي لإدخال كود التفعيل:<br>
+                    <span id="timer" style="color:#dc2626; font-size:20px; display:inline-block; margin-top:3px;">01:15</span>
                 </div>
 
                 <form action="/register" method="POST">
-                    <label style="font-size:12px; font-weight:bold;">كود التفعيل الحصري:</label>
-                    <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>كود التفعيل:</label>
+                    <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required style="border-color:#008060;">
                     
-                    <label style="font-size:12px; font-weight:bold;">اسم المتجر:</label>
-                    <input type="text" name="storeName" placeholder="أدخل اسم متجرك" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>اسم المتجر:</label>
+                    <input type="text" name="storeName" placeholder="مثال: ZASO Store" required>
                     
-                    <label style="font-size:12px; font-weight:bold;">رابط المتجر بالإنجليزية (Slug):</label>
-                    <input type="text" name="storeSlug" placeholder="store-name" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>رابط المتجر بالإنجليزية (Slug):</label>
+                    <input type="text" name="storeSlug" placeholder="zaso-store" required>
                     
-                    <label style="font-size:12px; font-weight:bold;">مجال التجارة:</label>
-                    <select name="storeCategory" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>مجال التجارة:</label>
+                    <select name="storeCategory" required>
                         <option value="ملابس وأزياء">ملابس وأزياء</option>
                         <option value="إلكترونيات وتكنولوجيا">إلكترونيات وتكنولوجيا</option>
                         <option value="صحة وجمال">صحة وجمال</option>
                         <option value="أجهزة منزلية">أجهزة منزلية</option>
                     </select>
 
-                    <label style="font-size:12px; font-weight:bold;">لون واجهة المتجر:</label>
-                    <select name="storeColor" style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>لون واجهة المتجر:</label>
+                    <select name="storeColor">
                         ${storeColors.map(c => `<option value="${c.code}">${c.name}</option>`).join('')}
                     </select>
 
-                    <label style="font-size:12px; font-weight:bold;">اسم المالك:</label>
-                    <input type="text" name="ownerName" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>اسم صاحب المتجر:</label>
+                    <input type="text" name="ownerName" placeholder="الاسم الكامل" required>
                     
-                    <label style="font-size:12px; font-weight:bold;">رقم واتساب:</label>
-                    <input type="text" name="whatsapp" value="213700000000" required style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>رقم واتساب:</label>
+                    <input type="text" name="whatsapp" value="213700000000" required>
                     
-                    <label style="font-size:12px; font-weight:bold;">معرف تيليغرام (Chat ID للإشعارات):</label>
-                    <input type="text" name="telegramChatId" placeholder="اختياري للتنبيهات" style="width:100%; padding:8px; margin:4px 0 10px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>معرف تيليغرام (Chat ID للإشعارات):</label>
+                    <input type="text" name="telegramChatId" placeholder="اختياري للتنبيهات الفورية">
                     
-                    <label style="font-size:12px; font-weight:bold;">كلمة المرور:</label>
-                    <input type="password" name="password" required style="width:100%; padding:8px; margin:4px 0 14px 0; border:1px solid #ccc; border-radius:4px; font-size:13px;">
+                    <label>كلمة المرور لوحة التحكم:</label>
+                    <input type="password" name="password" placeholder="********" required>
                     
-                    <button type="submit" style="background:#008060; color:#fff; border:none; padding:10px; width:100%; font-weight:bold; border-radius:4px; cursor:pointer; font-size:14px;">إنشاء المتجر 🚀</button>
+                    <button type="submit" class="btn btn-green">إنشاء المتجر 🚀</button>
                 </form>
-                <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; font-size:12px;">← عودة للرئيسية</a>
+                <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
             </div>
-        </body>
-        </html>
-    `);
+        </div>
+    `;
+    res.send(renderLayout('إنشاء متجر جديد', html, timerScript));
 });
 
 app.post('/register', (req, res) => {
     const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, whatsapp, telegramChatId, password } = req.body;
-    const idx = db.activeCodes.findIndex(c => c.code === activationCode);
-    if (idx === -1) return res.send('كود التفعيل غير صالح أو تم استخدامه! <a href="/register-page">عودة</a>');
-    if (db.stores.find(s => s.storeSlug === storeSlug)) return res.send('رابط المتجر محجوز مسبقاً. <a href="/register-page">عودة</a>');
+    const idx = db.activeCodes.findIndex(c => c.code === activationCode.trim());
+    if (idx === -1) return res.send(renderLayout('خطأ', '<div style="padding:20px;"><div class="card-box" style="text-align:center;"><h3 style="color:red; font-size:16px;">كود التفعيل غير صالح أو تم استخدامه!</h3><a href="/register-page" class="btn btn-green">عودة</a></div></div>'));
+    if (db.stores.find(s => s.storeSlug === storeSlug.trim())) return res.send(renderLayout('خطأ', '<div style="padding:20px;"><div class="card-box" style="text-align:center;"><h3 style="color:red; font-size:16px;">رابط المتجر محجوز مسبقاً!</h3><a href="/register-page" class="btn btn-green">عودة</a></div></div>'));
+    
     const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 6);
-    db.stores.push({ activationCode, storeName, storeSlug, storeCategory, storeColor: storeColor || '#008060', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
+    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#008060', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
     db.activeCodes.splice(idx, 1);
-    db.usedCodes.push(activationCode);
+    db.usedCodes.push(activationCode.trim());
     saveDB();
-    res.send(`<html dir="rtl"><body style="font-family:Tahoma; text-align:center; padding:40px;"><div style="background:#fff; padding:25px; max-width:400px; margin:auto; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.08);"><h2 style="color:#008060; font-size:18px;">مبروك ${ownerName}! تم إنشاء المتجر 🚀</h2><a href="/store/${storeSlug}" style="display:inline-block; background:#2563eb; color:#fff; padding:8px 16px; text-decoration:none; border-radius:4px; font-weight:bold; font-size:13px;">فتح المتجر 🛒</a><br><br><a href="/store/${storeSlug}/login" style="display:inline-block; background:#008060; color:#fff; padding:8px 16px; text-decoration:none; border-radius:4px; font-weight:bold; font-size:13px;">لوحة التحكم ⚙️</a></div></body></html>`);
+    
+    const html = `
+        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
+            <div class="card-box" style="text-align:center; margin:20px 0;">
+                <h2 style="color:#008060; margin-top:0; font-size:18px;">مبروك ${ownerName}! تم إنشاء المتجر 🚀</h2>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:18px;">
+                    <a href="/store/${storeSlug.trim()}" class="btn btn-blue">فتح المتجر 🛒</a>
+                    <a href="/store/${storeSlug.trim()}/login" class="btn btn-green">لوحة التحكم ⚙️</a>
+                </div>
+            </div>
+        </div>
+    `;
+    res.send(renderLayout('تم إنشاء المتجر', html));
 });
 
 app.get('/login-store', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:30px; text-align:center;"><div style="background:#fff; padding:20px; max-width:400px; margin:auto; border-radius:8px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.08);"><h2 style="color:#008060; text-align:center; font-size:18px;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666; font-size:12px;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:4px 8px; text-decoration:none; border-radius:4px; font-size:11px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; font-size:12px;">الرئيسية</a></div></body></html>`);
+    const html = `
+        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
+            <div class="card-box" style="margin:20px 0;">
+                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">اختر متجرك للدخول ⚙️</h2>
+                ${db.stores.length === 0 ? '<p style="text-align:center; color:#6b7280; font-size:13px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
+                ${db.stores.map(s => `<div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:14px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">دخول</a></div>`).join('')}
+                <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
+            </div>
+        </div>
+    `;
+    res.send(renderLayout('دخول التجار', html));
 });
 
 app.get('/store/:slug/login', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:20px; max-width:350px; margin:auto; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.08);"><h2 style="font-size:16px;">كلمة مرور المتجر</h2><form action="/store/${req.params.slug}/auth" method="POST"><input type="password" name="password" required style="width:100%; padding:9px; margin:10px 0; border:1px solid #ccc; border-radius:4px;"><button type="submit" style="width:100%; background:#008060; color:#fff; padding:9px; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">دخول</button></form><br><a href="/login-store" style="color:#555; text-decoration:none; font-size:12px;">← اختيار متجر آخر</a></div></body></html>`);
+    const html = `
+        <div style="padding:15px; max-width:400px; margin:0 auto; width:100%;">
+            <div class="card-box" style="text-align:center; margin:20px 0;">
+                <h2 style="color:#008060; margin-top:0; font-size:18px;">كلمة مرور لوحة التحكم</h2>
+                <form action="/store/${req.params.slug}/auth" method="POST">
+                    <input type="password" name="password" placeholder="أدخل كلمة المرور" required>
+                    <button type="submit" class="btn btn-green">دخول</button>
+                </form>
+                <a href="/login-store" style="display:block; margin-top:15px; color:#6b7280; text-decoration:none; font-size:13px;">← اختيار متجر آخر</a>
+            </div>
+        </div>
+    `;
+    res.send(renderLayout('تسجيل الدخول', html));
 });
 
 app.post('/store/:slug/auth', (req, res) => {
@@ -334,39 +374,47 @@ app.post('/store/:slug/auth', (req, res) => {
 app.get('/store/:slug/dashboard', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
-    res.send(`
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title></head>
-        <body style="font-family:Tahoma; background:#f3f4f6; padding:20px; text-align:center;">
-            <div style="background:#fff; padding:20px; max-width:650px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+    const html = `
+        <div style="padding:12px; max-width:600px; margin:0 auto; width:100%;">
+            <div class="card-box" style="margin:10px 0;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                    <a href="/store/${store.storeSlug}" target="_blank" style="background:#2563eb; color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:12px;">معاينة المتجر 🛒</a>
-                    <a href="/" style="background:#4b5563; color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:12px;">الرئيسية 🏠</a>
+                    <a href="/store/${store.storeSlug}" target="_blank" style="background:#2563eb; color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">معاينة المتجر 🛒</a>
+                    <a href="/" style="background:#4b5563; color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">الرئيسية 🏠</a>
                 </div>
-                <h2 style="color:${store.storeColor || '#008060'}; text-align:center; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
+                <h2 style="color:${store.storeColor || '#008060'}; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
                 <hr style="border:0; border-top:1px solid #eee; margin:12px 0;">
-                <h3 style="font-size:15px;">إضافة منتج وتخصيص مواصفاته (العدد: ${store.products.length}/10)</h3>
-                ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى.</p>' : `
+                
+                <h3 style="font-size:15px; margin-top:0;">إضافة منتج (${store.products.length}/10)</h3>
+                ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى للمنتجات.</p>' : `
                 <form action="/store/${store.storeSlug}/add-product" method="POST">
-                    <label style="font-size:12px;">اسم المنتج:</label>
-                    <input type="text" name="productName" required style="width:100%; padding:7px; margin:3px 0 8px 0; border:1px solid #ccc; border-radius:4px;">
-                    <label style="font-size:12px;">السعر (دج):</label>
-                    <input type="text" name="productPrice" required style="width:100%; padding:7px; margin:3px 0 8px 0; border:1px solid #ccc; border-radius:4px;">
-                    <label style="font-size:12px;">رابط صورة المنتج:</label>
-                    <input type="text" name="productImage" required style="width:100%; padding:7px; margin:3px 0 8px 0; border:1px solid #ccc; border-radius:4px;">
-                    <label style="font-size:12px;">الألوان المتاحة (افصل بفاصلة، اتركه فارغاً لعدم استخدام الألوان):</label>
-                    <input type="text" name="colors" placeholder="أسود، أبيض" style="width:100%; padding:7px; margin:3px 0 8px 0; border:1px solid #ccc; border-radius:4px;">
-                    <label style="font-size:12px;">القياسات / المقاسات (افصل بفاصلة، اتركه فارغاً لعدم استخدام المقاسات):</label>
-                    <input type="text" name="sizes" placeholder="S, M, L" style="width:100%; padding:7px; margin:3px 0 8px 0; border:1px solid #ccc; border-radius:4px;">
-                    <button type="submit" style="background:${store.storeColor || '#008060'}; color:#fff; border:none; padding:9px; width:100%; font-weight:bold; margin-top:5px; cursor:pointer; border-radius:4px; font-size:13px;">إضافة المنتج ➕</button>
+                    <label>اسم المنتج:</label>
+                    <input type="text" name="productName" required>
+                    <label>السعر (دج):</label>
+                    <input type="text" name="productPrice" required>
+                    <label>رابط صورة المنتج:</label>
+                    <input type="text" name="productImage" required>
+                    <label>الألوان المتاحة (اختياري، افصل بفاصلة):</label>
+                    <input type="text" name="colors" placeholder="أسود، أبيض">
+                    <label>المقاسات المتاحة (اختياري، افصل بفاصلة):</label>
+                    <input type="text" name="sizes" placeholder="S, M, L">
+                    <button type="submit" class="btn" style="background:${store.storeColor || '#008060'}; color:#fff;">إضافة المنتج ➕</button>
                 </form>`}
-                <h3 style="margin-top:18px; font-size:15px;">المنتجات:</h3>
-                ${store.products.length === 0 ? '<p style="color:#666; font-size:12px;">لا توجد منتجات مضافة بعد.</p>' : ''}
-                ${store.products.map((p, i) => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:12px;"><b>${p.name}</b> - ${p.price} دج</span><form action="/store/${store.storeSlug}/delete-product" method="POST" style="margin:0;"><input type="hidden" name="productIndex" value="${i}"><button type="submit" style="background:red; color:#fff; border:none; padding:3px 6px; cursor:pointer; border-radius:3px; font-size:11px;">حذف</button></form></div>`).join('')}
+
+                <h3 style="margin-top:20px; font-size:15px;">المنتجات الحالية:</h3>
+                ${store.products.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد منتجات مضافة بعد.</p>' : ''}
+                ${store.products.map((p, i) => `
+                    <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:13px;"><b>${p.name}</b> - ${p.price} دج</span>
+                        <form action="/store/${store.storeSlug}/delete-product" method="POST" style="margin:0;">
+                            <input type="hidden" name="productIndex" value="${i}">
+                            <button type="submit" style="background:#dc2626; color:#fff; border:none; padding:5px 8px; cursor:pointer; border-radius:6px; font-size:11px;">حذف</button>
+                        </form>
+                    </div>
+                `).join('')}
             </div>
-        </body>
-        </html>
-    `);
+        </div>
+    `;
+    res.send(renderLayout(`لوحة تحكم ${store.storeName}`, html));
 });
 
 app.post('/store/:slug/add-product', (req, res) => {
@@ -410,77 +458,95 @@ app.post('/store/:slug/checkout', async (req, res) => {
 
     const wa = `السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${quantity}%0A- السعر الإجمالي: ${totalPrice} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`;
     
-    res.send(`
-        <html dir="rtl">
-        <body style="font-family:Tahoma; text-align:center; padding:40px; background:#f3f4f6;">
-            <div style="background:#fff; padding:25px; max-width:400px; margin:auto; border-radius:8px; box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-                <h2 style="color:${store.storeColor || '#008060'}; font-size:18px;">تم إرسال الطلب بنجاح! 🎉</h2>
-                <p style="color:#555; font-size:12px; margin:8px 0 15px 0;">رقم التتبع الخاص بك: <b>#(${trackingId})</b></p>
-                <a href="https://wa.me/${store.whatsapp}?text=${wa}" style="display:inline-block; background:#25d366; color:#fff; padding:10px 18px; text-decoration:none; border-radius:4px; font-weight:bold; font-size:13px;">تأكيد الطلب عبر واتساب التاجر 📱</a>
+    const html = `
+        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
+            <div class="card-box" style="text-align:center; margin:20px 0;">
+                <h2 style="color:${store.storeColor || '#008060'}; margin-top:0;">تم إرسال الطلب بنجاح! 🎉</h2>
+                <p style="color:#4b5563; font-size:13px; margin-bottom:18px;">رقم التتبع الخاص بك: <b>#${trackingId}</b></p>
+                <a href="https://wa.me/${store.whatsapp}?text=${wa}" class="btn btn-wa">تأكيد الطلب عبر واتساب التاجر 📱</a>
             </div>
-            <script>setTimeout(()=>{window.location.href="https://wa.me/${store.whatsapp}?text=${wa}";},2000);</script>
-        </body>
-        </html>
-    `);
+        </div>
+        <script>setTimeout(()=>{window.location.href="https://wa.me/${store.whatsapp}?text=${wa}";},2000);</script>
+    `;
+    res.send(renderLayout('تم إرسال الطلب', html));
 });
 
 app.get('/store/:slug', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.status(404).send('المتجر غير موجود');
     const themeColor = store.storeColor || '#008060';
+    
     res.send(`
-        <html dir="rtl">
-        <head><meta charset="UTF-8"><title>${store.storeName}</title></head>
-        <body style="font-family:Tahoma; background:#f9fafb; margin:0; text-align:center;">
-            <header style="background:${themeColor}; color:#fff; padding:12px 20px; display:flex; justify-content:space-between; align-items:center;">
-                <h1 style="font-size:16px; margin:0;">🛒 ${store.storeName}</h1>
-                <a href="/store/${store.storeSlug}/login" style="background:rgba(255,255,255,0.2); color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:11px;">لوحة التحكم ⚙️</a>
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+            <title>${store.storeName}</title>
+            <style>
+                * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+                body { margin: 0; padding: 0; background: #f3f4f6; color: #111827; width: 100%; overflow-x: hidden; }
+                .store-header { background: ${themeColor}; color: #fff; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 100%; }
+                .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 12px; }
+                .product-card { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+                .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 200; padding: 12px; }
+                .modal-content { background: #fff; padding: 18px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: right; }
+                label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #374151; }
+                input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+            </style>
+        </head>
+        <body>
+            <header class="store-header">
+                <h1 style="font-size:17px; margin:0;">🛒 ${store.storeName}</h1>
+                <a href="/store/${store.storeSlug}/login" style="background:rgba(255,255,255,0.2); color:#fff; padding:6px 10px; text-decoration:none; border-radius:6px; font-size:11px; font-weight:bold;">لوحة التحكم ⚙️</a>
             </header>
-            <div style="max-width:650px; margin:20px auto; background:#fff; padding:18px; border-radius:8px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-                <h3 style="text-align:center; color:${themeColor}; font-size:16px;">قائمة المنتجات</h3>
-                ${store.products.length === 0 ? '<p style="text-align:center; color:#666; font-size:12px;">لا توجد منتجات معروضة حالياً.</p>' : ''}
+            
+            <div class="container">
+                ${store.products.length === 0 ? '<div style="background:#fff; padding:25px; border-radius:12px; text-align:center; color:#6b7280; font-size:13px;">لا توجد منتجات معروضة حالياً.</div>' : ''}
                 ${store.products.map(p => `
-                    <div style="background:#f3f4f6; padding:10px; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div class="product-card">
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${p.image}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
+                            <img src="${p.image}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
                             <div>
                                 <h4 style="margin:0 0 3px 0; font-size:14px;">${p.name}</h4>
-                                <span style="color:${themeColor}; font-weight:bold; font-size:13px;">${p.price} دج</span>
-                                <div style="font-size:11px; color:#555; margin-top:1px;">${p.colors ? 'ألوان: ' + p.colors : ''} ${p.sizes ? ' | مقاسات: ' + p.sizes : ''}</div>
+                                <span style="color:${themeColor}; font-weight:bold; font-size:14px;">${p.price} دج</span>
+                                <div style="font-size:11px; color:#6b7280; margin-top:2px;">${p.colors ? 'ألوان: ' + p.colors : ''} ${p.sizes ? ' | مقاسات: ' + p.sizes : ''}</div>
                             </div>
                         </div>
-                        <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" style="background:${themeColor}; color:#fff; border:none; padding:7px 12px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;">اطلب الآن 🛍️</button>
+                        <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" style="background:${themeColor}; color:#fff; border:none; padding:9px 12px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:12px; white-space:nowrap;">اطلب الآن 🛍️</button>
                     </div>
                 `).join('')}
             </div>
 
-            <div id="m" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-                <div style="background:#fff; padding:18px; border-radius:8px; width:90%; max-width:350px; text-align:right; box-shadow:0 4px 20px rgba(0,0,0,0.15);">
-                    <button onclick="document.getElementById('m').style.display='none'" style="background:red; color:#fff; border:none; padding:3px 6px; float:left; cursor:pointer; border-radius:3px; font-size:10px;">إغلاق</button>
-                    <h3 style="font-size:15px; margin-top:0;">إتمام الطلب</h3>
+            <div id="m" class="modal">
+                <div class="modal-content">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h3 style="font-size:16px; margin:0; color:${themeColor};">إتمام الطلب</h3>
+                        <button onclick="document.getElementById('m').style.display='none'" style="background:#ef4444; color:#fff; border:none; padding:4px 8px; cursor:pointer; border-radius:6px; font-size:11px; font-weight:bold;">إغلاق ✕</button>
+                    </div>
                     <form action="/store/${store.storeSlug}/checkout" method="POST">
                         <input type="hidden" name="productName" id="pn">
                         <input type="hidden" name="price" id="pp">
-                        <label style="font-size:11px;">الاسم:</label><input type="text" name="firstName" required style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;">
-                        <label style="font-size:11px;">اللقب:</label><input type="text" name="lastName" required style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;">
-                        <label style="font-size:11px;">رقم الهاتف:</label><input type="text" name="phone" required style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;">
-                        <label style="font-size:11px;">الولاية:</label>
-                        <select name="state" required style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;">
+                        <label>الاسم:</label><input type="text" name="firstName" required>
+                        <label>اللقب:</label><input type="text" name="lastName" required>
+                        <label>رقم الهاتف:</label><input type="tel" name="phone" required>
+                        <label>الولاية:</label>
+                        <select name="state" required>
                             <option value="">اختر الولاية</option>
                             ${states.map(st => `<option value="${st}">${st}</option>`).join('')}
                         </select>
-                        <label style="font-size:11px;">الكمية:</label><input type="number" name="quantity" value="1" min="1" required style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;">
+                        <label>الكمية:</label><input type="number" name="quantity" value="1" min="1" required>
                         
                         <div id="colorContainer" style="display:none;">
-                            <label style="font-size:11px;">اختر اللون:</label>
-                            <select name="color" id="cs" style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;"></select>
+                            <label>اختر اللون:</label>
+                            <select name="color" id="cs"></select>
                         </div>
                         <div id="sizeContainer" style="display:none;">
-                            <label style="font-size:11px;">اختر المقاس:</label>
-                            <select name="size" id="ss" style="width:100%; padding:6px; margin:2px 0 6px 0; border:1px solid #ccc; border-radius:3px;"></select>
+                            <label>اختر المقاس:</label>
+                            <select name="size" id="ss"></select>
                         </div>
 
-                        <button type="submit" style="width:100%; background:#25d366; color:#fff; padding:9px; border:none; border-radius:4px; font-weight:bold; margin-top:6px; cursor:pointer; font-size:13px;">إرسال الطلب عبر واتساب 🚀</button>
+                        <button type="submit" style="width:100%; background:#25d366; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:6px; cursor:pointer; font-size:14px;">إرسال الطلب عبر واتساب 🚀</button>
                     </form>
                 </div>
             </div>
