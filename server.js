@@ -65,7 +65,6 @@ async function sendTelegramNotification(chatId, message) {
 
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة"];
 
-// ألوان الأولد موني (Old Money) الراقية والهادئة من كلمة واحدة
 const storeColors = [
     { name: "كشميري", code: "#d4b996" },
     { name: "زيتوني", code: "#4a5d4e" },
@@ -106,8 +105,8 @@ function renderLayout(title, content, extraHead = '') {
             .btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; text-align: center; }
             .btn-green { background: #1b2a4a; color: #fff; }
             .btn-blue { background: #3d2314; color: #fff; }
-            label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #374151; }
-            input, select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
+            label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #1b2a4a; }
+            input, select, textarea { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; color: #111827; }
             input:focus, select:focus, textarea:focus { outline: none; border-color: #1b2a4a; }
         </style>
         ${extraHead}
@@ -227,7 +226,7 @@ app.get('/admin-dashboard', (req, res) => {
             <div class="card-box" style="margin:15px 0;">
                 <h2 style="color:#1b2a4a; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم المدير العام 🛠️</h2>
                 
-                <h3 style="font-size:15px; color:#333;">تخصيص مساحة الإعلانات:</h3>
+                <h3 style="font-size:15px; color:#1b2a4a; font-weight:bold;">تخصيص مساحة الإعلانات:</h3>
                 <form action="/admin/update-announcement" method="POST" enctype="multipart/form-data" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
                     <label>نوع الإعلان:</label>
                     <select name="announcementType" style="margin-bottom:10px;">
@@ -256,7 +255,7 @@ app.get('/admin-dashboard', (req, res) => {
 
                 <label>المتاجر المسجلة (${db.stores.length}):</label>
                 ${db.stores.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
-                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#1b2a4a; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
+                ${db.stores.map(s => `<div style="background:#f9fafb; padding:8px; border:1px solid #e5e7eb; border-radius:6px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:13px; color:#1b2a4a; font-weight:bold;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}" target="_blank" style="background:#1b2a4a; color:#fff; padding:4px 10px; text-decoration:none; border-radius:4px; font-size:11px;">زيارة المتجر</a></div>`).join('')}
                 
                 <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← تسجيل الخروج للرئيسية</a>
             </div>
@@ -451,7 +450,7 @@ app.get('/store/:slug/dashboard', (req, res) => {
                 <h2 style="color:${store.storeColor || '#1b2a4a'}; text-align:center; margin-top:0; font-size:18px;">لوحة تحكم: ${store.storeName}</h2>
                 <hr style="border:0; border-top:1px solid #eee; margin:12px 0;">
                 
-                <h3 style="font-size:15px; margin-top:0;">إضافة منتج (${store.products.length}/10)</h3>
+                <h3 style="font-size:15px; margin-top:0; color:#1b2a4a; font-weight:bold;">إضافة منتج (${store.products.length}/10)</h3>
                 ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى للمنتجات.</p>' : `
                 <form action="/store/${store.storeSlug}/add-product" method="POST" enctype="multipart/form-data">
                     <label>اسم المنتج:</label>
@@ -469,21 +468,21 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <button type="submit" class="btn" style="background:${store.storeColor || '#1b2a4a'}; color:#fff;">إضافة المنتج ➕</button>
                 </form>`}
 
-                <h3 style="margin-top:20px; font-size:15px;">الطلبات الواردة (${store.orders.length}):</h3>
+                <h3 style="margin-top:20px; font-size:15px; color:#1b2a4a; font-weight:bold;">الطلبات الواردة (${store.orders.length}):</h3>
                 ${store.orders.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد طلبات مسجلة بعد.</p>' : ''}
                 ${store.orders.map(o => `
                     <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:8px; font-size:12px;">
-                        <div><b>#${o.trackingId}</b> - ${o.productName} (${o.price} دج)</div>
-                        <div style="color:#4b5563; margin-top:3px;">الزبون: ${o.firstName} ${o.lastName} | الهاتف: ${o.phone} | الولاية: ${o.state}</div>
-                        <div style="color:#6b7280; margin-top:2px;">الكمية: ${o.quantity} | اللون: ${o.color || 'غير محدد'} | المقاس: ${o.size || 'غير محدد'}</div>
+                        <div><b>#${o.trackingId}</b> - <span style="color:#1b2a4a; font-weight:bold;">${o.productName}</span> (${o.price} دج)</div>
+                        <div style="color:#374151; margin-top:4px;">الزبون: <b>${o.firstName} ${o.lastName}</b> | الهاتف: <a href="tel:${o.phone}" style="color:#2563eb; font-weight:bold;">${o.phone}</a> | الولاية: ${o.state}</div>
+                        <div style="color:#4b5563; margin-top:3px;">الكمية: <b>${o.quantity}</b> | اللون: ${o.color || 'غير محدد'} | المقاس: ${o.size || 'غير محدد'}</div>
                     </div>
                 `).join('')}
 
-                <h3 style="margin-top:20px; font-size:15px;">المنتجات الحالية:</h3>
+                <h3 style="margin-top:20px; font-size:15px; color:#1b2a4a; font-weight:bold;">المنتجات الحالية:</h3>
                 ${store.products.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد منتجات مضافة بعد.</p>' : ''}
                 ${store.products.map((p, i) => `
                     <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:13px;"><b>${p.name}</b> - ${p.price} دج</span>
+                        <span style="font-size:13px; color:#1b2a4a; font-weight:bold;"><b>${p.name}</b> - ${p.price} دج</span>
                         <form action="/store/${store.storeSlug}/delete-product" method="POST" style="margin:0;">
                             <input type="hidden" name="productIndex" value="${i}">
                             <button type="submit" style="background:#dc2626; color:#fff; border:none; padding:5px 8px; cursor:pointer; border-radius:6px; font-size:11px;">حذف</button>
@@ -496,7 +495,6 @@ app.get('/store/:slug/dashboard', (req, res) => {
     res.send(renderLayout(`لوحة تحكم ${store.storeName}`, html));
 });
 
-// دعم رفع عدة صور للمنتج
 app.post('/store/:slug/add-product', upload.array('productImages', 5), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
@@ -533,7 +531,6 @@ app.post('/store/:slug/checkout', async (req, res) => {
     const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
     const totalPrice = parseFloat(price) * parseInt(quantity || 1);
     
-    // حفظ الطلب في قاعدة بيانات المتجر لتظهر في لوحة التحكم
     store.orders.unshift({ trackingId, productName, price: totalPrice, firstName, lastName, phone, state, quantity, color, size });
     saveDB();
 
@@ -542,7 +539,7 @@ app.post('/store/:slug/checkout', async (req, res) => {
         await sendTelegramNotification(store.telegramChatId, msg);
     }
 
-    const wa = `السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${quantity}%0A- السعر الإجمالي: ${totalPrice} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`;
+    const wa = encodeURIComponent(`السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${quantity}%0A- السعر الإجمالي: ${totalPrice} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`);
     
     const html = `
         <style>
@@ -561,7 +558,6 @@ app.post('/store/:slug/checkout', async (req, res) => {
     res.send(html);
 });
 
-// تصميم متجر الأولد موني الفخم مع عرض الصور المتعددة، ميزة التكبير، الوصف، وزر الطلب تحت الوصف
 app.get('/store/:slug', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.status(404).send('المتجر غير موجود');
@@ -581,8 +577,6 @@ app.get('/store/:slug', (req, res) => {
                 .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 12px; }
                 
                 .product-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
-                
-                /* تنسيق صور المنتج المتعددة */
                 .product-images-grid { display: flex; gap: 8px; padding: 12px; overflow-x: auto; background: #faf9f6; }
                 .product-thumb { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1.5px solid #d4b996; transition: 0.2s; flex-shrink: 0; }
                 .product-thumb:hover { transform: scale(1.03); }
@@ -591,14 +585,13 @@ app.get('/store/:slug', (req, res) => {
 
                 .product-info { padding: 15px; text-align: right; }
                 .product-title { font-size: 19px; font-weight: bold; margin: 0 0 5px 0; color: #1b2a4a; }
-                .product-price { font-size: 17px; font-weight: bold; color: ${themeColor}; margin-bottom: 10px; }
+                .product-price { font-size: 18px; font-weight: bold; color: ${themeColor}; margin-bottom: 10px; }
                 .product-desc { font-size: 13px; color: #4b5563; line-height: 1.6; margin-bottom: 12px; }
                 .product-meta { font-size: 12px; color: #6b7280; margin-bottom: 15px; }
                 
                 .order-btn { display: block; width: 100%; background: ${themeColor}; color: #fff; border: none; padding: 13px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
                 .order-btn:hover { opacity: 0.9; }
 
-                /* نافذة تكبير الصورة (Lightbox) */
                 .lightbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 300; padding: 15px; }
                 .lightbox-img { max-width: 100%; max-height: 85vh; border-radius: 8px; object-fit: contain; }
 
@@ -622,12 +615,10 @@ app.get('/store/:slug', (req, res) => {
                     let imgs = p.images || [p.image || "https://i.ibb.co/6P82W8h/default-avatar.png"];
                     return `
                     <div class="product-card">
-                        <!-- الصورة الرئيسية التي تكبر عند النقر -->
                         <div class="main-img-container">
                             <img src="${imgs[0]}" id="mainImg_${idx}" class="main-product-img" onclick="openLightbox(this.src)">
                         </div>
                         
-                        <!-- معرض صور المنتج المصغرة لاختيارها -->
                         ${imgs.length > 1 ? `
                         <div class="product-images-grid">
                             ${imgs.map(img => `<img src="${img}" class="product-thumb" onclick="document.getElementById('mainImg_${idx}').src='${img}'">`).join('')}
@@ -639,14 +630,12 @@ app.get('/store/:slug', (req, res) => {
                             <div class="product-desc">${p.desc || 'لا يوجد وصف مضاف لهذا المنتج.'}</div>
                             <div class="product-meta">${p.colors ? 'الأنواع/الألوان: ' + p.colors : ''} ${p.sizes ? ' | المقاسات: ' + p.sizes : ''}</div>
                             
-                            <!-- زر الطلب أصبح تحت الوصف مباشرة -->
                             <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
                     </div>`;
                 }).join('')}
             </div>
 
-            <!-- نافذة تكبير الصورة -->
             <div id="lightbox" class="lightbox-modal" onclick="this.style.display='none'">
                 <img id="lightboxImg" class="lightbox-img">
             </div>
