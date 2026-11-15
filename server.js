@@ -200,7 +200,7 @@ function renderLayout(title, content, extraHead = '') {
                 if(l==='fr'){
                     t1.innerText="Créez votre boutique pro en secondes";
                     t2.innerText="Comment fonctionne ClickShop ?";
-                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de votre boutique, recevoir les commandes instantanément via Telegram et WhatsApp !";
+                    desc.innerText="Nous travaillons 24/7 pour assurer la stabilité de your boutique, recevoir les commandes instantanément via Telegram et WhatsApp !";
                     b1.innerText="🚀 Créer ma nouvelle boutique";
                     b2.innerText="⚙️ Connexion Marchand";
                 }else if(l==='en'){
@@ -449,7 +449,7 @@ app.post('/register', (req, res) => {
     if (db.stores.find(s => s.storeSlug === storeSlug.trim())) return res.send(renderLayout('خطأ', '<div style="padding:20px;"><div class="card-box" style="text-align:center;"><h3 style="color:red; font-size:16px;">رابط المتجر محجوز مسبقاً!</h3><a href="/register-page" class="btn btn-green">عودة</a></div></div>'));
     
     const expiry = new Date(); expiry.setMonth(expiry.getMonth() + 6);
-    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#1b2a4a', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, products: [], orders: [], expiryDate: expiry.toISOString() });
+    db.stores.push({ activationCode: activationCode.trim(), storeName, storeSlug: storeSlug.trim(), storeCategory, storeColor: storeColor || '#1b2a4a', ownerName, whatsapp: whatsapp || "213700000000", telegramChatId: telegramChatId || "", logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png", password, defaultShippingPrice: 500, products: [], orders: [], expiryDate: expiry.toISOString() });
     db.activeCodes.splice(idx, 1);
     db.usedCodes.push(activationCode.trim());
     saveDB();
@@ -525,6 +525,8 @@ app.post('/store/:slug/auth', (req, res) => {
 app.get('/store/:slug/dashboard', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
+    if (store.defaultShippingPrice === undefined) store.defaultShippingPrice = 500;
+
     const html = `
         <div style="padding:12px; max-width:600px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:10px 0;">
@@ -542,6 +544,13 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <button type="submit" class="btn" style="background:${store.storeColor || '#1b2a4a'}; color:#fff; padding:10px;">حفظ وتحديث شعار المتجر 🖼️</button>
                 </form>
 
+                <h3 style="font-size:15px; margin-top:0; color:#1b2a4a; font-weight:bold;">سعر التوصيل الافتراضي:</h3>
+                <form action="/store/${store.storeSlug}/update-shipping" method="POST" style="margin-bottom:20px; background:#f9fafb; padding:12px; border-radius:8px; border:1px solid #e5e7eb;">
+                    <label>سعر التوصيل (دج):</label>
+                    <input type="number" name="defaultShippingPrice" value="${store.defaultShippingPrice}" required style="margin-bottom:10px;">
+                    <button type="submit" class="btn" style="background:#3d2314; color:#fff; padding:10px;">حفظ سعر التوصيل 🚚</button>
+                </form>
+
                 <h3 style="font-size:15px; margin-top:0; color:#1b2a4a; font-weight:bold;">إضافة منتج (${store.products.length}/10)</h3>
                 ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى للمنتجات.</p>' : `
                 <form action="/store/${store.storeSlug}/add-product" method="POST" enctype="multipart/form-data">
@@ -553,9 +562,9 @@ app.get('/store/:slug/dashboard', (req, res) => {
                     <textarea name="productDesc" rows="3" placeholder="اكتب وصفاً جذاباً للمنتج..." required></textarea>
                     <label>صور المنتج (يمكنك اختيار حتى 10 صور من معرض الهاتف):</label>
                     <input type="file" name="productImages" accept="image/*" multiple required style="background:#fff;">
-                    <label>الأنواع / الألوان المتاحة (من كلمة واحدة، افصل بفاصلة):</label>
-                    <input type="text" name="colors" placeholder="كشميري، زيتوني، كحلي">
-                    <label>المقاسات المتاحة (اختياري، افصل بفاصلة):</label>
+                    <label>الأنواع / الألوان المتاحة (افصل بينها بفاصلة أو نقطة عربية):</label>
+                    <input type="text" name="colors" placeholder="أحمر، أبيض، أسود">
+                    <label>المقاسات المتاحة (اختياري، افصل بينها بفاصلة):</label>
                     <input type="text" name="sizes" placeholder="S, M, L">
                     <button type="submit" class="btn" style="background:${store.storeColor || '#1b2a4a'}; color:#fff;">إضافة المنتج ➕</button>
                 </form>`}
@@ -564,7 +573,7 @@ app.get('/store/:slug/dashboard', (req, res) => {
                 ${store.orders.length === 0 ? '<p style="color:#6b7280; font-size:12px;">لا توجد طلبات مسجلة بعد.</p>' : ''}
                 ${store.orders.map(o => `
                     <div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:8px; font-size:12px;">
-                        <div><b>#${o.trackingId}</b> - <span style="color:#1b2a4a; font-weight:bold;">${o.productName}</span> (${o.price} دج)</div>
+                        <div><b>#${o.trackingId}</b> - <span style="color:#1b2a4a; font-weight:bold;">${o.productName}</span> (المنتج: ${o.itemPrice} دج | التوصيل: ${o.shippingPrice} دج | المجموع: <b>${o.price} دج</b>)</div>
                         <div style="color:#374151; margin-top:4px;">الزبون: <b>${o.firstName} ${o.lastName}</b> | الهاتف: <a href="tel:${o.phone}" style="color:#2563eb; font-weight:bold;">${o.phone}</a> | الولاية: ${o.state}</div>
                         <div style="color:#4b5563; margin-top:3px;">الكمية: <b>${o.quantity}</b> | اللون: ${o.color || 'غير محدد'} | المقاس: ${o.size || 'غير محدد'}</div>
                     </div>
@@ -596,7 +605,15 @@ app.post('/store/:slug/update-logo', upload.single('storeLogoFile'), (req, res) 
     res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
-// رفع حتى 10 صور للمنتج بكل أمان بدون أخطاء
+app.post('/store/:slug/update-shipping', (req, res) => {
+    const store = db.stores.find(s => s.storeSlug === req.params.slug);
+    if (store) {
+        store.defaultShippingPrice = parseFloat(req.body.defaultShippingPrice) || 0;
+        saveDB();
+    }
+    res.redirect(`/store/${req.params.slug}/dashboard`);
+});
+
 app.post('/store/:slug/add-product', upload.array('productImages', 10), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
@@ -614,7 +631,7 @@ app.post('/store/:slug/add-product', upload.array('productImages', 10), (req, re
         });
         saveDB();
     }
-    res.redirect(`/store/${store.storeSlug}/dashboard`);
+    res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
 app.post('/store/:slug/delete-product', (req, res) => {
@@ -623,25 +640,45 @@ app.post('/store/:slug/delete-product', (req, res) => {
         store.products.splice(parseInt(req.body.productIndex), 1);
         saveDB();
     }
-    res.redirect(`/store/${store.storeSlug}/dashboard`);
+    res.redirect(`/store/${req.params.slug}/dashboard`);
 });
 
 app.post('/store/:slug/checkout', async (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
+    if (store.defaultShippingPrice === undefined) store.defaultShippingPrice = 500;
+
     const { productName, price, firstName, lastName, phone, state, quantity, color, size } = req.body;
     const trackingId = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
-    const totalPrice = parseFloat(price) * parseInt(quantity || 1);
     
-    store.orders.unshift({ trackingId, productName, price: totalPrice, firstName, lastName, phone, state, quantity, color, size });
+    const unitPrice = parseFloat(price);
+    const qty = parseInt(quantity || 1);
+    const itemsTotal = unitPrice * qty;
+    const shipping = store.defaultShippingPrice;
+    const grandTotal = itemsTotal + shipping;
+    
+    store.orders.unshift({ 
+        trackingId, 
+        productName, 
+        itemPrice: itemsTotal, 
+        shippingPrice: shipping, 
+        price: grandTotal, 
+        firstName, 
+        lastName, 
+        phone, 
+        state, 
+        quantity: qty, 
+        color, 
+        size 
+    });
     saveDB();
 
     if (store.telegramChatId) {
-        const msg = `🛒 *طلب جديد في متجرك!*\\n- التتبع: #${trackingId}\\n- الزبون: ${firstName} ${lastName}\\n- الهاتف: ${phone}\\n- الولاية: ${state}\\n- المنتج: ${productName}\\n- الكمية: ${quantity}\\n- السعر الإجمالي: ${totalPrice} دج\\n- اللون: ${color || 'غير محدد'} | المقاس: ${size || 'غير محدد'}`;
+        const msg = `🛒 *طلب جديد في متجرك!*\\n- التتبع: #${trackingId}\\n- الزبون: ${firstName} ${lastName}\\n- الهاتف: ${phone}\\n- الولاية: ${state}\\n- المنتج: ${productName}\\n- الكمية: ${qty}\\n- سعر المنتجات: ${itemsTotal} دج\\n- سعر التوصيل: ${shipping} دج\\n- *المجموع الإجمالي: ${grandTotal} دج*\\n- اللون: ${color || 'غير محدد'} | المقاس: ${size || 'غير محدد'}`;
         await sendTelegramNotification(store.telegramChatId, msg);
     }
 
-    const wa = encodeURIComponent(`السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${quantity}%0A- السعر الإجمالي: ${totalPrice} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`);
+    const wa = encodeURIComponent(`السلام عليكم، طلب جديد:%0A- التتبع: #${trackingId}%0A- الاسم: ${firstName} ${lastName}%0A- الهاتف: ${phone}%0A- الولاية: ${state}%0A- المنتج: ${productName}%0A- الكمية: ${qty}%0A- سعر المنتجات: ${itemsTotal} دج%0A- سعر التوصيل: ${shipping} دج%0A- المجموع الإجمالي: ${grandTotal} دج%0A- اللون: ${color || 'غير محدد'}%0A- المقاس: ${size || 'غير محدد'}`);
     
     const html = `
         <style>
@@ -651,7 +688,7 @@ app.post('/store/:slug/checkout', async (req, res) => {
         <div style="padding:15px; max-width:450px; margin:40px auto; width:100%;">
             <div style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.08); text-align:center;">
                 <h2 style="color:${store.storeColor || '#1b2a4a'}; margin-top:0;">تم إرسال الطلب بنجاح! 🎉</h2>
-                <p style="color:#4b5563; font-size:13px; margin-bottom:18px;">رقم التتبع الخاص بك: <b>#${trackingId}</b></p>
+                <p style="color:#4b5563; font-size:13px; margin-bottom:18px;">رقم التتبع الخاص بك: <b>#${trackingId}</b><br>المجموع الإجمالي (مع التوصيل): <b>${grandTotal} دج</b></p>
                 <a href="https://wa.me/${store.whatsapp}?text=${wa}" style="display:block; background:#25d366; color:#fff; padding:13px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:15px;">تأكيد الطلب عبر واتساب التاجر 📱</a>
             </div>
         </div>
@@ -664,6 +701,7 @@ app.get('/store/:slug', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.status(404).send('المتجر غير موجود');
     const themeColor = store.storeColor || '#1b2a4a';
+    if (store.defaultShippingPrice === undefined) store.defaultShippingPrice = 500;
     
     let storeLogoHTML = `<div style="background:#fff; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; color:${themeColor}; font-weight:bold; font-size:10px; box-shadow:0 2px 5px rgba(0,0,0,0.15);">Logo</div>`;
     if (store.logoUrl && store.logoUrl !== "https://i.ibb.co/6P82W8h/default-avatar.png") {
@@ -706,6 +744,10 @@ app.get('/store/:slug', (req, res) => {
                 .modal-content { background: #fff; padding: 18px; border-radius: 12px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; text-align: right; }
                 label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #374151; }
                 input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+                
+                .price-summary { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+                .price-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+                .price-total { display: flex; justify-content: space-between; font-weight: bold; font-size: 15px; color: ${themeColor}; border-top: 1px dashed #d1d5db; padding-top: 6px; margin-top: 4px; }
             </style>
         </head>
         <body>
@@ -735,7 +777,7 @@ app.get('/store/:slug', (req, res) => {
                             <h3 class="product-title">${p.name}</h3>
                             <div class="product-price">${p.price} دج</div>
                             <div class="product-desc">${p.desc || 'لا يوجد وصف مضاف لهذا المنتج.'}</div>
-                            <div class="product-meta">${p.colors ? 'الأنواع/الألوان: ' + p.colors : ''} ${p.sizes ? ' | المقاسات: ' + p.sizes : ''}</div>
+                            <div class="product-meta">${p.colors ? 'الألوان: ' + p.colors : ''} ${p.sizes ? ' | المقاسات: ' + p.sizes : ''}</div>
                             
                             <button onclick="openModal('${p.name}', '${p.price}', '${p.colors || ''}', '${p.sizes || ''}')" class="order-btn">اطلب الآن 🛍️</button>
                         </div>
@@ -764,7 +806,9 @@ app.get('/store/:slug', (req, res) => {
                             <option value="">اختر الولاية</option>
                             ${states.map(st => `<option value="${st}">${st}</option>`).join('')}
                         </select>
-                        <label>الكمية:</label><input type="number" name="quantity" value="1" min="1" required>
+                        
+                        <label>الكمية:</label>
+                        <input type="number" name="quantity" id="qtyInput" value="1" min="1" required oninput="calculateTotal()">
                         
                         <div id="colorContainer" style="display:none;">
                             <label>اختر اللون:</label>
@@ -775,12 +819,21 @@ app.get('/store/:slug', (req, res) => {
                             <select name="size" id="ss"></select>
                         </div>
 
+                        <div class="price-summary">
+                            <div class="price-row"><span>سعر المنتجات:</span> <span id="itemsPriceText">0 دج</span></div>
+                            <div class="price-row"><span>سعر التوصيل:</span> <span>${store.defaultShippingPrice} دج</span></div>
+                            <div class="price-total"><span>المجموع الإجمالي:</span> <span id="grandTotalText">0 دج</span></div>
+                        </div>
+
                         <button type="submit" style="width:100%; background:#25d366; color:#fff; padding:12px; border:none; border-radius:8px; font-weight:bold; margin-top:6px; cursor:pointer; font-size:14px;">إرسال الطلب عبر واتساب 🚀</button>
                     </form>
                 </div>
             </div>
 
             <script>
+                let currentUnitPrice = 0;
+                const shippingCost = ${store.defaultShippingPrice};
+
                 function openLightbox(src){
                     document.getElementById('lightboxImg').src = src;
                     document.getElementById('lightbox').style.display = 'flex';
@@ -789,12 +842,18 @@ app.get('/store/:slug', (req, res) => {
                 function openModal(n,p,cols,szs){
                     document.getElementById('pn').value=n;
                     document.getElementById('pp').value=p;
+                    currentUnitPrice = parseFloat(p);
+                    document.getElementById('qtyInput').value = 1;
+                    calculateTotal();
                     
                     let cBox = document.getElementById('colorContainer');
                     let c = document.getElementById('cs');
                     if(cols && cols.trim() !== ''){
                         c.innerHTML='';
-                        cols.split(',').forEach(x=>{ let o=document.createElement('option'); o.value=x.trim(); o.innerHTML=x.trim(); c.appendChild(o); });
+                        cols.split(/[,،]/).forEach(x=>{ 
+                            let tc = x.trim();
+                            if(tc){ let o=document.createElement('option'); o.value=tc; o.innerHTML=tc; c.appendChild(o); }
+                        });
                         cBox.style.display = 'block';
                     } else {
                         cBox.style.display = 'none';
@@ -805,7 +864,10 @@ app.get('/store/:slug', (req, res) => {
                     let s = document.getElementById('ss');
                     if(szs && szs.trim() !== ''){
                         s.innerHTML='';
-                        szs.split(',').forEach(x=>{ let o=document.createElement('option'); o.value=x.trim(); o.innerHTML=x.trim(); s.appendChild(o); });
+                        szs.split(/[,،]/).forEach(x=>{ 
+                            let ts = x.trim();
+                            if(ts){ let o=document.createElement('option'); o.value=ts; o.innerHTML=ts; s.appendChild(o); }
+                        });
                         sBox.style.display = 'block';
                     } else {
                         sBox.style.display = 'none';
@@ -813,6 +875,15 @@ app.get('/store/:slug', (req, res) => {
                     }
 
                     document.getElementById('m').style.display='flex';
+                }
+
+                function calculateTotal(){
+                    let qty = parseInt(document.getElementById('qtyInput').value) || 1;
+                    let itemsTotal = currentUnitPrice * qty;
+                    let grandTotal = itemsTotal + shippingCost;
+                    
+                    document.getElementById('itemsPriceText').innerText = itemsTotal + ' دج';
+                    document.getElementById('grandTotalText').innerText = grandTotal + ' دج';
                 }
             </script>
         </body>
