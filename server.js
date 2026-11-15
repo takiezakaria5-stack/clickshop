@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const https = require('https');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +38,7 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
+// ملف Manifest لتثبيت التطبيق على الهاتف
 app.get('/manifest.json', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify({
@@ -48,9 +48,10 @@ app.get('/manifest.json', (req, res) => {
     }));
 });
 
+// ملف Service Worker بوضع الجلب المباشر (لا يخزن الصفحة لكي تظهر التحديثات فوراً)
 app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
-    res.send(`self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`);
+    res.send(`self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request)); });`);
 });
 
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة", "59. تيزي وزو", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"];
@@ -70,7 +71,7 @@ const storeColors = [
     { name: "أخضر زيتوني", code: "#4d7c0f" }
 ];
 
-// الصفحة الرئيسية: اسم المنصة يوديك لدخول المدير، والأزرار تحت بعضها
+// الصفحة الرئيسية مع دعم الـ PWA Manifest
 app.get('/', (req, res) => {
     res.send(`
         <html dir="rtl">
@@ -78,6 +79,11 @@ app.get('/', (req, res) => {
             <meta charset="UTF-8">
             <title>ClickShop</title>
             <link rel="manifest" href="/manifest.json">
+            <script>
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js');
+                }
+            </script>
         </head>
         <body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center; margin:0;">
             <div style="background:#fff; padding:40px; max-width:450px; margin:40px auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center;">
@@ -94,7 +100,7 @@ app.get('/', (req, res) => {
     `);
 });
 
-// صفحة تسجيل دخول المدير العام بكلمة السر kenouni19
+// تسجيل دخول المدير العام
 app.get('/admin-login', (req, res) => {
     res.send(`
         <html dir="rtl">
