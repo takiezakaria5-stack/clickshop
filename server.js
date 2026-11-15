@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const fs = require('path').existsSync(path.join(__dirname, 'node_modules')) ? require('fs') : require('fs');
+const fs = require('fs');
 const https = require('https');
 
 const app = express();
@@ -27,20 +27,15 @@ let db = {
         instagram: "https://instagram.com",
         facebook: "https://facebook.com",
         telegram: "https://t.me",
-        telegramBotToken: "" // توكن بوت تيليغرام الخاص بالمنصة (اختياري للإشعارات)
+        telegramBotToken: ""
     },
     activeCodes: [
-        "CS-9X4F-7B2K", "CS-3M8R-9P1W", "CS-5V2X-4H8N", "CS-1K9L-6D3Z", "CS-8T4Y-2F5X",
-        "CS-6C3W-8J9M", "CS-2H7P-1Q4V", "CS-4N1Z-5K6B", "CS-7D9F-3X2R", "CS-9L2K-8M7T",
-        "CS-3W5H-4P1Y", "CS-1V8X-9N6C", "CS-5R2J-7Z3Q", "CS-8F4M-6B1K", "CS-2P9T-5W4D",
-        "CS-6X3K-8H7N", "CS-4Z1V-9Q2R", "CS-7M5W-1F8L", "CS-9B6Y-2D3P", "CS-3K8F-4X9T",
-        "CS-1H2N-7J6C", "CS-5Q4R-3V1Z", "CS-8W9X-6M2K", "CS-2D7L-5P8H", "CS-6F1T-9B4W",
-        "CS-4V3Y-8Z2F", "CS-7K9P-1N5X", "CS-9R2M-4H3Q", "CS-3X6C-7D1L", "CS-1T5V-8K9B"
+        "9X4F7B2K", "3M8R9P1W", "5V2X4H8N", "1K9L6D3Z", "8T4Y2F5X",
+        "6C3W8J9M", "2H7P1Q4V", "4N1Z5K6B", "7D9F3X2R", "9L2K8M7T"
     ],
     usedCodes: []
 };
 
-// تحميل البيانات من الملف إذا كان موجوداً
 if (fs.existsSync(DB_FILE)) {
     try {
         const data = fs.readFileSync(DB_FILE, 'utf8');
@@ -54,15 +49,12 @@ function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// دالة إرسال إشعار تيليغرام أوتوماتيكي للتاجر
 function sendTelegramNotification(chatId, message) {
     const token = db.siteSettings.telegramBotToken;
     if (!token || !chatId) return;
 
     const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`;
-    https.get(url, (res) => {
-        // رسالة عبر الإنترنت في الخلفية بدون تأثير على سرعة الموقع
-    }).on('error', (e) => {
+    https.get(url, (res) => {}).on('error', (e) => {
         console.log("Telegram Error: ", e);
     });
 }
@@ -105,6 +97,19 @@ app.post('/admin/settings', (req, res) => {
     res.redirect('/admin/dashboard');
 });
 
+// مولد الأكواد السرية العشوائية بصيغة XXXXXXXX (8 خانات)
+app.post('/admin/generate-codes', (req, res) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let newCode = '';
+    for (let i = 0; i < 8; i++) {
+        newCode += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    
+    db.activeCodes.push(newCode);
+    saveDB();
+    res.redirect('/admin/dashboard');
+});
+
 // تسجيل متجر جديد
 app.post('/register', (req, res) => {
     const { activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password } = req.body;
@@ -131,7 +136,7 @@ app.post('/register', (req, res) => {
         ownerName, 
         password,
         whatsapp: "213700000000",
-        telegramChatId: "", // معرف تيليغرام الخاص بالتاجر لتلقي الإشعارات
+        telegramChatId: "",
         logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
         products: [],
         orders: [],
@@ -181,18 +186,31 @@ app.get('/admin/dashboard', (req, res) => {
             body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
             .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
             .box h2, .box h3 { text-align: center; }
-            ul { padding-right: 20px; max-height: 130px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
+            ul { padding-right: 20px; max-height: 120px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
             li { margin-bottom: 5px; font-family: monospace; font-size: 14px; }
             .form-group { margin-bottom: 12px; }
             label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
             input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 5px; }
             .btn { background: #008060; color: white; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+            .gen-btn { background: #2563eb; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-bottom: 15px; }
         </style>
         </head>
         <body>
             <div class="box">
                 <h2 style="color: #008060;">لوحة تحكم مدير منصة ClickShop</h2>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <h3 style="color: #2563eb; margin-bottom: 10px;">مولد الأكواد السرية (XXXXXXXX)</h3>
+                <form action="/admin/generate-codes" method="POST">
+                    <button type="submit" class="gen-btn">توليد كود سري جديد ⚡</button>
+                </form>
+                <p style="font-size:13px; color:#555;">الأكواد النشطة السرية (${db.activeCodes.length}):</p>
+                <ul>
+                    ${db.activeCodes.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+            </div>
+
+            <div class="box">
                 <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات المنصة وبوت تيليغرام العام</h3>
                 <form action="/admin/settings" method="POST">
                     <div class="form-group"><label>شعار المنصة:</label><input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('b64').value=r.result; r.readAsDataURL(this.files[0]);"><input type="hidden" name="base64Logo" id="b64"></div>
@@ -204,6 +222,7 @@ app.get('/admin/dashboard', (req, res) => {
                     <button type="submit" class="btn">حفظ الإعدادات 💾</button>
                 </form>
             </div>
+            
             <div class="box">
                 <h3 style="color: #059669;">المتاجر المسجلة (${db.stores.length}):</h3>
                 <ul>
@@ -456,7 +475,6 @@ app.post('/store/:slug/checkout', (req, res) => {
     store.orders.push(newOrder);
     saveDB();
 
-    // إرسال إشعار فوري أوتوماتيكي عبر تيليغرام للتاجر إذا كان مسجلاً معرفه
     if (store.telegramChatId) {
         const tgMsg = `🚨 *طلب جديد في متجرك (${store.storeName})!*\\n\\n` +
                       `📦 التتبع: \`#${trackingId}\`\\n` +
