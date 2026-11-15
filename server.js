@@ -5,14 +5,14 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir, { recursive: true });
+    fs.existsSync(uploadDir) || fs.mkdirSync(uploadDir, { recursive: true });
 }
 
 let stores = [];
@@ -36,15 +36,14 @@ let activeCodes = [
 
 let usedCodes = [];
 
-// API لجلب الإعدادات لواجهة الزوار
+// API الإعدادات العامة
 app.get('/api/settings', (req, res) => {
     res.json(siteSettings);
 });
 
-// تحديث الإعدادات والشعار من لوحة التحكم
+// تحديث إعدادات المنصة الرئيسية
 app.post('/admin/settings', (req, res) => {
     const { whatsapp, instagram, facebook, telegram, base64Logo } = req.body;
-    
     if (base64Logo) {
         try {
             const matches = base64Logo.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
@@ -55,16 +54,12 @@ app.post('/admin/settings', (req, res) => {
                 fs.writeFileSync(path.join(uploadDir, filename), bitmap);
                 siteSettings.logoUrl = `/uploads/${filename}`;
             }
-        } catch (e) {
-            console.log("Error saving image:", e);
-        }
+        } catch (e) { console.log(e); }
     }
-
     if (whatsapp) siteSettings.whatsapp = whatsapp;
     if (instagram) siteSettings.instagram = instagram;
     if (facebook) siteSettings.facebook = facebook;
     if (telegram) siteSettings.telegram = telegram;
-    
     res.redirect('/admin/dashboard');
 });
 
@@ -74,25 +69,26 @@ app.post('/register', (req, res) => {
     const codeIndex = activeCodes.indexOf(activationCode);
     
     if (codeIndex === -1) {
-        return res.status(400).send(`
-            <html dir="rtl" lang="ar">
-            <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
-                <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color: #dc2626;">خطأ في التفعيل!</h2>
-                    <p style="margin-top: 15px;">كود التفعيل غير صالح، أو تم استخدامه من قبل.</p>
-                    <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة للمحاولة</a>
-                </div>
-            </body>
-            </html>
-        `);
+        return res.status(400).send(`<html dir="rtl" lang="ar"><body style="font-family:Tahoma; text-align:center; padding:50px;"><h2>كود التفعيل غير صالح أو مستعمل!</h2><a href="/">العودة</a></body></html>`);
     }
 
     const slugExists = stores.find(s => s.storeSlug === storeSlug);
     if (slugExists) {
-        return res.status(400).send('رابط المتجر (Slug) محجوز مسبقاً، اختر رابطاً آخر.');
+        return res.status(400).send('رابط المتجر محجوز مسبقاً.');
     }
 
-    stores.push({ activationCode, storeName, storeSlug, storeCategory, storeColor, ownerName, password });
+    stores.push({ 
+        activationCode, 
+        storeName, 
+        storeSlug, 
+        storeCategory, 
+        storeColor, 
+        ownerName, 
+        password,
+        logoUrl: "https://i.ibb.co/6P82W8h/default-avatar.png",
+        products: [] // قائمة المنتجات الخاصة بالمتجر
+    });
+
     activeCodes.splice(codeIndex, 1);
     usedCodes.push(activationCode);
 
@@ -107,134 +103,212 @@ app.post('/register', (req, res) => {
                 <input type="text" value="https://clickshop-b19x.onrender.com/store/${storeSlug}" readonly style="width: 100%; padding: 10px; text-align: center; font-family: monospace; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 5px; margin: 10px 0;" onclick="this.select();">
                 <br>
                 <a href="/store/${storeSlug}" target="_blank" style="display: inline-block; margin-top: 10px; background: #2563eb; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">فتح المتجر مباشرة 🛒</a>
+                <br><br>
+                <a href="/store/${storeSlug}/login" style="display: inline-block; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">لوحة تحكم التاجر ⚙️</a>
                 <br>
-                <a href="/" style="display: inline-block; margin-top: 15px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">العودة للرئيسية</a>
+                <a href="/" style="display: inline-block; margin-top: 15px; color: #4b5563; text-decoration: none;">العودة للرئيسية</a>
             </div>
         </body>
         </html>
     `);
 });
 
-// التحقق من كلمة مرور المشرف
+// دخول الأدمن العام
 app.post('/admin/login', (req, res) => {
     const { password } = req.body;
     if (password === 'kenouni19') {
         res.status(200).json({ success: true });
     } else {
-        res.status(401).json({ success: false, message: 'كلمة المرور خاطئة' });
+        res.status(401).json({ success: false });
     }
 });
 
-// لوحة التحكم (Dashboard) النظيفة والآمنة
+// لوحة التحكم العامة للمنصة
 app.get('/admin/dashboard', (req, res) => {
     res.send(`
         <html dir="rtl" lang="ar">
-        <head>
-            <meta charset="UTF-8">
-            <title>لوحة التحكم - ClickShop</title>
-            <style>
-                body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
-                .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
-                .box h2, .box h3 { text-align: center; }
-                ul { padding-right: 20px; max-height: 130px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
-                li { margin-bottom: 5px; font-family: monospace; font-size: 14px; color: #1f2937; }
-                .form-group { margin-bottom: 12px; }
-                label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #374151; }
-                input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 5px; font-size: 14px; }
-                .btn { background: #008060; color: white; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-                .btn:hover { background: #006e52; }
-                .preview-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; display: block; margin: 10px auto; border: 2px solid #008060; }
-            </style>
+        <head><meta charset="UTF-8"><title>لوحة تحكم المنصة</title>
+        <style>
+            body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
+            .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
+            .box h2, .box h3 { text-align: center; }
+            ul { padding-right: 20px; max-height: 130px; overflow-y: auto; background: #f9fafb; padding: 10px; border-radius: 5px; border: 1px solid #e5e7eb; }
+            li { margin-bottom: 5px; font-family: monospace; font-size: 14px; }
+            .form-group { margin-bottom: 12px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
+            input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 5px; }
+            .btn { background: #008060; color: white; border: none; padding: 10px; width: 100%; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        </style>
         </head>
         <body>
             <div class="box">
                 <h2 style="color: #008060;">لوحة تحكم مدير منصة ClickShop</h2>
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
-                
-                <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات الشعار ومواقع التواصل</h3>
-                
-                <div style="text-align: center; margin-bottom: 15px;">
-                    <label>الشعار الحالي:</label>
-                    <img src="${siteSettings.logoUrl}" class="preview-logo" alt="Current Logo">
-                </div>
-
+                <h3 style="color: #2563eb; margin-bottom: 15px;">إعدادات الشعار العام ومواقع التواصل</h3>
                 <form action="/admin/settings" method="POST">
-                    <div class="form-group">
-                        <label>اختر صورة الشعار من الاستوديو (Gallery):</label>
-                        <input type="file" accept="image/*" onchange="convertImageToBase64(this)">
-                        <input type="hidden" name="base64Logo" id="base64Logo">
-                    </div>
-                    <div class="form-group">
-                        <label>رقم الواتساب:</label>
-                        <input type="text" name="whatsapp" value="${siteSettings.whatsapp}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>رابط إنستغرام:</label>
-                        <input type="text" name="instagram" value="${siteSettings.instagram}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>رابط فيسبوك:</label>
-                        <input type="text" name="facebook" value="${siteSettings.facebook}" required>
-                    </div>
-                    <div class="form-group">
-                        <label>رابط تلغرام:</label>
-                        <input type="text" name="telegram" value="${siteSettings.telegram}" required>
-                    </div>
-                    <button type="submit" class="btn">حفظ وتحديث الإعدادات 💾</button>
+                    <div class="form-group"><label>شعار المنصة:</label><input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('b64').value=r.result; r.readAsDataURL(this.files[0]);"><input type="hidden" name="base64Logo" id="b64"></div>
+                    <div class="form-group"><label>الواتساب:</label><input type="text" name="whatsapp" value="${siteSettings.whatsapp}"></div>
+                    <div class="form-group"><label>إنستغرام:</label><input type="text" name="instagram" value="${siteSettings.instagram}"></div>
+                    <div class="form-group"><label>فيسبوك:</label><input type="text" name="facebook" value="${siteSettings.facebook}"></div>
+                    <div class="form-group"><label>تلغرام:</label><input type="text" name="telegram" value="${siteSettings.telegram}"></div>
+                    <button type="submit" class="btn">حفظ الإعدادات 💾</button>
                 </form>
             </div>
-
             <div class="box">
-                <h3 style="color: #059669;">الأكواد الصعبة المتاحة (${activeCodes.length}):</h3>
+                <h3 style="color: #059669;">المتاجر المسجلة (${stores.length}):</h3>
                 <ul>
-                    ${activeCodes.map(code => `<li>${code}</li>`).join('')}
-                </ul>
-
-                <h3 style="margin-top: 20px; color: #dc2626;">الأكواد المستعملة (${usedCodes.length}):</h3>
-                <ul>
-                    ${usedCodes.map(code => `<li>${code}</li>`).join('')}
-                </ul>
-
-                <h3 style="margin-top: 20px; color: #2563eb;">المتاجر المسجلة (${stores.length}):</h3>
-                <ul>
-                    ${stores.map(s => `<li><b>${s.storeName}</b> (<a href="/store/${s.storeSlug}" target="_blank">/store/${s.storeSlug}</a>) - المالك: ${s.ownerName}</li>`).join('')}
+                    ${stores.map(s => `<li><b>${s.storeName}</b> - رابط: <a href="/store/${s.storeSlug}" target="_blank">/store/${s.storeSlug}</a> | <a href="/store/${s.storeSlug}/login">لوحة تحكم التاجر</a></li>`).join('')}
                 </ul>
             </div>
-
-            <script>
-                function convertImageToBase64(element) {
-                    const file = element.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = function() {
-                            document.getElementById('base64Logo').value = reader.result;
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                }
-            </script>
         </body>
         </html>
     `);
 });
 
-// مسار عرض متجر الزبون حسب الرابط (Slug)[span_1](start_span)[span_1](end_span)
+// صفحة تسجيل دخول صاحب المتجر
+app.get('/store/:slug/login', (req, res) => {
+    const slug = req.params.slug;
+    res.send(`
+        <html dir="rtl" lang="ar">
+        <head><meta charset="UTF-8"><title>تسجيل دخول التاجر</title>
+        <style>body{font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;} .card{background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1);}</style>
+        </head>
+        <body>
+            <div class="card">
+                <h2>تسجيل دخول لوحة المتجر</h2>
+                <form action="/store/${slug}/auth" method="POST">
+                    <input type="password" name="password" placeholder="أدخل كلمة مرور متجرك" required style="width:100%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;">
+                    <button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold;">دخول</button>
+                </form>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+app.post('/store/:slug/auth', (req, res) => {
+    const slug = req.params.slug;
+    const { password } = req.body;
+    const store = stores.find(s => s.storeSlug === slug);
+    if (store && store.password === password) {
+        res.redirect(`/store/${slug}/dashboard?auth=true`);
+    } else {
+        res.send(`<script>alert('كلمة المرور خاطئة!'); window.location.href='/store/${slug}/login';</script>`);
+    }
+});
+
+// لوحة تحكم صاحب المتجر (إضافة وحذف المنتجات + تغيير شعار المتجر)
+app.get('/store/:slug/dashboard', (req, res) => {
+    const slug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === slug);
+    if (!store) return res.send('المتجر غير موجود');
+
+    res.send(`
+        <html dir="rtl" lang="ar">
+        <head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title>
+        <style>
+            body { font-family: Tahoma; background: #f3f4f6; padding: 20px; text-align: center; }
+            .box { background: #fff; padding: 25px; border-radius: 10px; max-width: 600px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; text-align: right; }
+            .box h2, .box h3 { text-align: center; }
+            input, button { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+            .btn { background: #008060; color: white; border: none; font-weight: bold; cursor: pointer; }
+            .product-item { display: flex; justify-content: space-between; align-items: center; background: #f9fafb; padding: 10px; border: 1px solid #e5e7eb; border-radius: 5px; margin-bottom: 8px; }
+            .del-btn { background: #dc2626; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; width: auto; }
+            .logo-preview { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #008060; }
+        </style>
+        </head>
+        <body>
+            <div class="box">
+                <h2 style="color: #008060;">
+                    <img src="${store.logoUrl}" class="logo-preview">
+                    لوحة تحكم متجر: ${store.storeName}
+                </h2>
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+                
+                <h3>تغيير شعار المتجر</h3>
+                <form action="/store/${slug}/update-logo" method="POST">
+                    <input type="file" accept="image/*" onchange="let r = new FileReader(); r.onload = ()=>document.getElementById('logoB64').value=r.result; r.readAsDataURL(this.files[0]);" required>
+                    <input type="hidden" name="logoB64" id="logoB64">
+                    <button type="submit" class="btn">حفظ الشعار الجديد</button>
+                </form>
+
+                <h3 style="margin-top: 20px;">إضافة منتج جديد</h3>
+                <form action="/store/${slug}/add-product" method="POST">
+                    <input type="text" name="productName" placeholder="اسم المنتج" required>
+                    <input type="text" name="productPrice" placeholder="السعر (دج)" required>
+                    <button type="submit" class="btn">إضافة المنتج ➕</button>
+                </form>
+
+                <h3 style="margin-top: 20px;">قائمة المنتجات (${store.products.length})</h3>
+                <div>
+                    ${store.products.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد منتجات حالياً.</p>' : ''}
+                    ${store.products.map((p, index) => `
+                        <div class="product-item">
+                            <span><b>${p.name}</b> - ${p.price} دج</span>
+                            <form action="/store/${slug}/delete-product" method="POST" style="margin:0;">
+                                <input type="hidden" name="productIndex" value="${index}">
+                                <button type="submit" class="del-btn">حذف</button>
+                            </form>
+                        </div>
+                    `).join('')}
+                </div>
+                <br>
+                <a href="/store/${slug}" target="_blank" style="display:block; text-align:center; background:#2563eb; color:#fff; padding:10px; text-decoration:none; border-radius:5px; font-weight:bold;">معاينة المتجر 🛒</a>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// تحديث شعار المتجر
+app.post('/store/:slug/update-logo', (req, res) => {
+    const slug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === slug);
+    const { logoB64 } = req.body;
+    if (store && logoB64) {
+        try {
+            const matches = logoB64.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+            if (matches && matches.length === 3) {
+                const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+                const bitmap = Buffer.from(matches[2], 'base64');
+                const filename = `store-logo-${Date.now()}.${ext}`;
+                fs.writeFileSync(path.join(uploadDir, filename), bitmap);
+                store.logoUrl = `/uploads/${filename}`;
+            }
+        } catch (e) { console.log(e); }
+    }
+    res.redirect(`/store/${slug}/dashboard`);
+});
+
+// إضافة منتج
+app.post('/store/:slug/add-product', (req, res) => {
+    const slug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === slug);
+    const { productName, productPrice } = req.body;
+    if (store && productName && productPrice) {
+        store.products.push({ name: productName, price: productPrice });
+    }
+    res.redirect(`/store/${slug}/dashboard`);
+});
+
+// حذف منتج
+app.post('/store/:slug/delete-product', (req, res) => {
+    const slug = req.params.slug;
+    const store = stores.find(s => s.storeSlug === slug);
+    const { productIndex } = req.body;
+    if (store && productIndex !== undefined) {
+        store.products.splice(parseInt(productIndex), 1);
+    }
+    res.redirect(`/store/${slug}/dashboard`);
+});
+
+// واجهة عرض المتجر للزبائن (تعرض الشعار بجانب الاسم + قائمة المنتجات)
 app.get('/store/:slug', (req, res) => {
     const storeSlug = req.params.slug;
     const store = stores.find(s => s.storeSlug === storeSlug);
 
     if (!store) {
-        return res.status(404).send(`
-            <html dir="rtl" lang="ar">
-            <body style="font-family: Tahoma; text-align: center; padding: 50px; background: #f3f4f6;">
-                <div style="background: white; padding: 30px; border-radius: 10px; max-width: 400px; margin: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <h2 style="color: #dc2626;">المتجر غير موجود!</h2>
-                    <p style="margin-top: 15px;">عذراً، هذا المتجر غير مسجل أو أن الرابط غير صحيح.</p>
-                    <a href="/" style="display: inline-block; margin-top: 20px; background: #008060; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">الرئيسية</a>
-                </div>
-            </body>
-            </html>
-        `);
+        return res.status(404).send('المتجر غير موجود');
     }
 
     res.send(`
@@ -244,20 +318,33 @@ app.get('/store/:slug', (req, res) => {
             <title>${store.storeName}</title>
             <style>
                 body { font-family: Tahoma; background: #f9fafb; margin: 0; padding: 0; text-align: center; }
-                header { background: ${store.storeColor.includes('أسود') ? '#111' : store.storeColor.includes('أزرق') ? '#1e3a8a' : store.storeColor.includes('أحمر') ? '#b91c1c' : '#008060'}; color: white; padding: 30px; }
-                h1 { font-size: 32px; margin-bottom: 5px; }
-                p { font-size: 16px; opacity: 0.9; }
-                .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+                header { background: ${store.storeColor.includes('أسود') ? '#111' : store.storeColor.includes('أزرق') ? '#1e3a8a' : store.storeColor.includes('أحمر') ? '#b91c1c' : '#008060'}; color: white; padding: 30px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+                .store-logo { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+                .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: right; }
+                .product-card { background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+                .buy-btn { background: #25d366; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; }
             </style>
         </head>
         <body>
             <header>
-                <h1>🛒 ${store.storeName}</h1>
-                <p>مرحباً بكم في متجرنا - المجال: ${store.storeCategory}</p>
+                <img src="${store.logoUrl}" class="store-logo" alt="Logo">
+                <div>
+                    <h1 style="font-size: 28px; margin:0;">🛒 ${store.storeName}</h1>
+                    <p style="margin:5px 0 0 0; font-size:14px; opacity:0.9;">المالك: ${store.ownerName} | المجال: ${store.storeCategory}</p>
+                </div>
             </header>
             <div class="container">
-                <h2>أهلاً بك في متجر ${store.ownerName}</h2>
-                <p style="margin-top: 20px; color: #4b5563;">المنصة قيد تجهيز المنتجات وعرض السلع... انتظرونا قريباً!</p>
+                <h3 style="text-align: center; color: #008060; margin-bottom: 20px;">قائمة المنتجات والسلع</h3>
+                ${store.products.length === 0 ? '<p style="text-align:center; color:#666;">لم يتم إضافة منتجات بعد في هذا المتجر.</p>' : ''}
+                ${store.products.map(p => `
+                    <div class="product-card">
+                        <div>
+                            <h4 style="margin:0 0 5px 0; color:#1f2937;">${p.name}</h4>
+                            <span style="color:#059669; font-weight:bold;">${p.price} دج</span>
+                        </div>
+                        <a href="https://wa.me/${siteSettings.whatsapp}?text=السلام عليكم، أود طلب منتج: ${p.name} بسعر ${p.price}دج من متجر ${store.storeName}" target="_blank" class="buy-btn">اطلب عبر الواتساب 📱</a>
+                    </div>
+                `).join('')}
             </div>
         </body>
         </html>
