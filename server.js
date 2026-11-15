@@ -96,7 +96,6 @@ function renderLayout(title, content, extraHead = '') {
             .brand h1 { margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
             .logo-circle { background: #fff; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #008060; font-weight: bold; font-size: 11px; box-shadow: 0 2px 5px rgba(0,0,0,0.15); }
             
-            /* زر اللغات الموحد المنسدل */
             .lang-dropdown { position: relative; display: inline-block; }
             .lang-main-btn { background: rgba(255,255,255,0.2); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 5px; }
             .lang-content { display: none; position: absolute; left: 0; background-color: #fff; min-width: 100px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); border-radius: 6px; z-index: 1; overflow: hidden; }
@@ -110,7 +109,6 @@ function renderLayout(title, content, extraHead = '') {
             .btn { display: block; width: 100%; padding: 13px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 15px; border: none; cursor: pointer; text-align: center; }
             .btn-green { background: #008060; color: #fff; }
             .btn-blue { background: #2563eb; color: #fff; }
-            .btn-wa { background: #25d366; color: #fff; }
             label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #374151; }
             input, select { width: 100%; padding: 11px; margin-bottom: 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; background: #fff; }
             input:focus, select:focus { outline: none; border-color: #008060; }
@@ -336,7 +334,7 @@ app.get('/register-page', (req, res) => {
 
                 <form action="/register" method="POST">
                     <label>كود التفعيل:</label>
-                    <input type="text" name="activationCode" placeholder="مثال: CS-9X4F-7B2K" required style="border-color:#008060;">
+                    <input type="text" name="activationCode" placeholder="مثال: CS-XXXX-XXXX" required style="border-color:#008060;">
                     
                     <label>اسم المتجر:</label>
                     <input type="text" name="storeName" placeholder="مثال: ClickShop Store" required>
@@ -404,18 +402,34 @@ app.post('/register', (req, res) => {
     res.send(renderLayout('تم إنشاء المتجر', html));
 });
 
+// صفحة تسجيل دخول التجار المحدثة (إدخال رابط المتجر وكلمة المرور مباشرة)
 app.get('/login-store', (req, res) => {
     const html = `
-        <div style="padding:15px; max-width:450px; margin:0 auto; width:100%;">
+        <div style="padding:15px; max-width:400px; margin:0 auto; width:100%;">
             <div class="card-box" style="margin:20px 0;">
-                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">اختر متجرك للدخول ⚙️</h2>
-                ${db.stores.length === 0 ? '<p style="text-align:center; color:#6b7280; font-size:13px;">لا توجد متاجر مسجلة بعد.</p>' : ''}
-                ${db.stores.map(s => `<div style="background:#f9fafb; padding:10px; border:1px solid #e5e7eb; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:14px;"><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:6px; font-size:12px; font-weight:bold;">دخول</a></div>`).join('')}
+                <h2 style="color:#008060; text-align:center; margin-top:0; font-size:18px;">تسجيل دخول التجار ⚙️</h2>
+                <form action="/login-store-direct" method="POST">
+                    <label>رابط المتجر بالإنجليزية (Slug):</label>
+                    <input type="text" name="storeSlug" placeholder="مثال: my-store" required>
+                    <label>كلمة المرور:</label>
+                    <input type="password" name="password" placeholder="كلمة مرور لوحة التحكم" required>
+                    <button type="submit" class="btn btn-green">دخول لوحة التحكم 🚀</button>
+                </form>
                 <a href="/" style="display:block; text-align:center; color:#6b7280; text-decoration:none; margin-top:15px; font-size:13px;">← عودة للرئيسية</a>
             </div>
         </div>
     `;
     res.send(renderLayout('دخول التجار', html));
+});
+
+app.post('/login-store-direct', (req, res) => {
+    const { storeSlug, password } = req.body;
+    const store = db.stores.find(s => s.storeSlug === storeSlug.trim());
+    if (store && store.password === password) {
+        res.redirect(`/store/${store.storeSlug}/dashboard`);
+    } else {
+        res.send(`<script>alert('رابط المتجر أو كلمة المرور خطأ!'); window.location.href='/login-store';</script>`);
+    }
 });
 
 app.get('/store/:slug/login', (req, res) => {
@@ -458,13 +472,13 @@ app.get('/store/:slug/dashboard', (req, res) => {
                 
                 <h3 style="font-size:15px; margin-top:0;">إضافة منتج (${store.products.length}/10)</h3>
                 ${store.products.length >= 10 ? '<p style="color:red; font-size:12px;">بلغت الحد الأقصى للمنتجات.</p>' : `
-                <form action="/store/${store.storeSlug}/add-product" method="POST">
+                <form action="/store/${store.storeSlug}/add-product" method="POST" enctype="multipart/form-data">
                     <label>اسم المنتج:</label>
                     <input type="text" name="productName" required>
                     <label>السعر (دج):</label>
                     <input type="text" name="productPrice" required>
-                    <label>رابط صورة المنتج:</label>
-                    <input type="text" name="productImage" required>
+                    <label>صورة المنتج (من معرض الهاتف Gallery):</label>
+                    <input type="file" name="productImageFile" accept="image/*" required style="background:#fff;">
                     <label>الألوان المتاحة (اختياري، افصل بفاصلة):</label>
                     <input type="text" name="colors" placeholder="أسود، أبيض">
                     <label>المقاسات المتاحة (اختياري، افصل بفاصلة):</label>
@@ -489,13 +503,17 @@ app.get('/store/:slug/dashboard', (req, res) => {
     res.send(renderLayout(`لوحة تحكم ${store.storeName}`, html));
 });
 
-app.post('/store/:slug/add-product', (req, res) => {
+app.post('/store/:slug/add-product', upload.single('productImageFile'), (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (store && store.products.length < 10) {
+        let imgUrl = "https://i.ibb.co/6P82W8h/default-avatar.png";
+        if (req.file) {
+            imgUrl = '/uploads/' + req.file.filename;
+        }
         store.products.push({ 
             name: req.body.productName, 
             price: req.body.productPrice, 
-            image: req.body.productImage, 
+            image: imgUrl, 
             colors: req.body.colors || "", 
             sizes: req.body.sizes || "" 
         });
