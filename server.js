@@ -69,14 +69,41 @@ const storeColors = [
 app.get('/', (req, res) => {
     res.send(`
         <html dir="rtl">
-        <head><meta charset="UTF-8"><title>ClickShop</title></head>
-        <body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center; margin:0;">
-            <div style="background:#fff; padding:40px; max-width:450px; margin:40px auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-                <h1 style="color:#008060; margin-bottom:10px; cursor:pointer;" onclick="window.location.href='/admin-login'">🛒 منصة ClickShop</h1>
-                <p style="color:#666; margin-bottom:30px;">أنشئ متجرك الإلكتروني بكل سهولة وقم بإدارة أعمالك باحترافية</p>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>ClickShop - منصة المتاجر الإلكترونية</title>
+        </head>
+        <body style="font-family:Tahoma; background:#f3f4f6; margin:0; padding:0; text-align:center;">
+            <!-- الشعار العلوي الاحترافي -->
+            <div style="background:#008060; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; color:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h2 style="margin:0; font-size:22px; cursor:pointer;" onclick="window.location.href='/admin-login'" title="لوحة تحكم المدير العام">ClickShop 🛒</h2>
+                <div style="background:#fff; border-radius:50%; width:45px; height:45px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+                    <span style="font-size:11px; font-weight:bold; color:#008060;">Logo</span>
+                </div>
+            </div>
+
+            <div style="max-width:500px; margin:30px auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 4px 20px rgba(0,0,0,0.08); text-align:center;">
+                
+                <!-- مكان الإعلانات المخصص -->
+                <div style="border: 2px dashed #f59e0b; background:#fffbeb; padding:15px; border-radius:10px; margin-bottom:25px; color:#b45309; font-size:14px; font-weight:bold;">
+                    📢 مكان مخصص للإعلانات والعروض الخاصة بك هنا
+                </div>
+
+                <h2 style="color:#111827; margin-bottom:10px; font-size:24px;">أنشئ متجرك الإلكتروني الاحترافي في ثوانٍ</h2>
+                <p style="color:#4b5563; font-size:14px; margin-bottom:25px; line-height:1.6;">منصة متكاملة لإطلاق تجارتك الذكية، بتحكم كامل في الهوية، الألوان، وبأمان تام عبر أكواد التفعيل الحصرية.</p>
+                
                 <div style="display:flex; flex-direction:column; gap:12px;">
-                    <a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold;">إنشاء متجر جديد 🚀</a>
-                    <a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold;">تسجيل دخول التجار ⚙️</a>
+                    <a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(0,128,96,0.2);">🚀 ابدأ إنشاء متجرك الآن</a>
+                    <a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; font-size:16px; box-shadow:0 4px 10px rgba(37,99,235,0.2);">⚙️ تسجيل دخول التجار</a>
+                </div>
+
+                <!-- أزرار التواصل الاجتماعي -->
+                <div style="display:flex; justify-content:center; gap:15px; margin-top:30px;">
+                    <a href="#" style="background:#0088cc; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:18px;">✈️</a>
+                    <a href="#" style="background:#1877f2; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:18px;">f</a>
+                    <a href="#" style="background:#e4405f; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:18px;">📷</a>
+                    <a href="#" style="background:#25d366; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:18px;">💬</a>
                 </div>
             </div>
         </body>
@@ -89,7 +116,7 @@ app.get('/admin-login', (req, res) => {
         <html dir="rtl">
         <head><meta charset="UTF-8"><title>دخول المدير العام</title></head>
         <body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;">
-            <div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px;">
+            <div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
                 <h2 style="color:#008060;">لوحة تحكم المدير العام</h2>
                 <form action="/admin-auth" method="POST">
                     <input type="password" name="adminPassword" placeholder="كلمة المرور السرية" required style="width:100%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;">
@@ -115,7 +142,7 @@ app.get('/admin-dashboard', (req, res) => {
         <html dir="rtl">
         <head><meta charset="UTF-8"><title>لوحة المدير العام</title></head>
         <body style="font-family:Tahoma; background:#f3f4f6; padding:30px; text-align:center;">
-            <div style="background:#fff; padding:30px; max-width:600px; margin:auto; border-radius:10px; text-align:right;">
+            <div style="background:#fff; padding:30px; max-width:600px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
                 <h2 style="color:#008060; text-align:center;">لوحة تحكم المدير العام 🛠️</h2>
                 <hr>
                 <p><b>عدد المتاجر النشطة:</b> ${db.stores.length}</p>
@@ -135,7 +162,7 @@ app.get('/register-page', (req, res) => {
         <html dir="rtl">
         <head><meta charset="UTF-8"><title>إنشاء متجر</title></head>
         <body style="font-family:Tahoma; background:#f3f4f6; padding:30px; text-align:center;">
-            <div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;">
+            <div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
                 <h2 style="color:#008060; text-align:center;">فتح متجر جديد</h2>
                 <form action="/register" method="POST">
                     <label>كود التفعيل (8 خانات):</label>
@@ -146,7 +173,7 @@ app.get('/register-page', (req, res) => {
                     <input type="text" name="storeSlug" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
                     <label>مجال المتجر:</label>
                     <input type="text" name="storeCategory" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
-                    <label>لون واجهة المتجر:</label>
+                    <label>لون واجهة المتجر (12 لوناً):</label>
                     <select name="storeColor" style="width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:5px;">
                         ${storeColors.map(c => `<option value="${c.code}">${c.name}</option>`).join('')}
                     </select>
@@ -181,11 +208,11 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/login-store', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.1);"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none;">الرئيسية</a></div></body></html>`);
 });
 
 app.get('/store/:slug/login', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;"><div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px;"><h2>كلمة مرور المتجر</h2><form action="/store/${req.params.slug}/auth" method="POST"><input type="password" name="password" required style="width:100%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;"><button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">دخول</button></form><br><a href="/login-store" style="color:#555; text-decoration:none; font-size:13px;">← اختيار متجر آخر</a></div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;"><div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1);"><h2>كلمة مرور المتجر</h2><form action="/store/${req.params.slug}/auth" method="POST"><input type="password" name="password" required style="width:100%; padding:10px; margin:15px 0; border:1px solid #ccc; border-radius:5px;"><button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">دخول</button></form><br><a href="/login-store" style="color:#555; text-decoration:none; font-size:13px;">← اختيار متجر آخر</a></div></body></html>`);
 });
 
 app.post('/store/:slug/auth', (req, res) => {
@@ -200,7 +227,7 @@ app.post('/store/:slug/auth', (req, res) => {
 app.get('/store/:slug/dashboard', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:20px; text-align:center;"><div style="background:#fff; padding:25px; max-width:700px; margin:auto; border-radius:10px; text-align:right;"><div style="display:flex; justify-content:space-between; margin-bottom:15px;"><a href="/store/${store.storeSlug}" target="_blank" style="background:#2563eb; color:#fff; padding:8px 15px; text-decoration:none; border-radius:5px;">معاينة المتجر 🛒</a><a href="/" style="background:#4b5563; color:#fff; padding:8px 15px; text-decoration:none; border-radius:5px;">الرئيسية 🏠</a></div><h2 style="color:${store.storeColor || '#008060'}; text-align:center;">لوحة تحكم: ${store.storeName}</h2><hr><h3>إضافة منتج (العدد: ${store.products.length}/10)</h3>${store.products.length >= 10 ? '<p style="color:red;">بلغت الحد الأقصى.</p>' : `<form action="/store/${store.storeSlug}/add-product" method="POST"><input type="text" name="productName" placeholder="اسم المنتج" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="productPrice" placeholder="السعر (دج)" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="productImage" placeholder="رابط صورة المنتج" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="colors" value="أسود، أبيض" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="sizes" value="قياس موحد" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><button type="submit" style="background:${store.storeColor || '#008060'}; color:#fff; border:none; padding:10px; width:100%; font-weight:bold; margin-top:10px; cursor:pointer; border-radius:5px;">إضافة المنتج ➕</button></form>`}<h3 style="margin-top:25px;">المنتجات</h3>${store.products.map((p, i) => `<div style="background:#f9fafb; padding:10px; border:1px solid #ddd; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span><b>${p.name}</b> - ${p.price}دج</span><form action="/store/${store.storeSlug}/delete-product" method="POST" style="margin:0;"><input type="hidden" name="productIndex" value="${i}"><button type="submit" style="background:red; color:#fff; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;">حذف</button></form></div>`).join('')}</div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>لوحة تحكم ${store.storeName}</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:20px; text-align:center;"><div style="background:#fff; padding:25px; max-width:700px; margin:auto; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.1);"><div style="display:flex; justify-content:space-between; margin-bottom:15px;"><a href="/store/${store.storeSlug}" target="_blank" style="background:#2563eb; color:#fff; padding:8px 15px; text-decoration:none; border-radius:5px;">معاينة المتجر 🛒</a><a href="/" style="background:#4b5563; color:#fff; padding:8px 15px; text-decoration:none; border-radius:5px;">الرئيسية 🏠</a></div><h2 style="color:${store.storeColor || '#008060'}; text-align:center;">لوحة تحكم: ${store.storeName}</h2><hr><h3>إضافة منتج (العدد: ${store.products.length}/10)</h3>${store.products.length >= 10 ? '<p style="color:red;">بلغت الحد الأقصى.</p>' : `<form action="/store/${store.storeSlug}/add-product" method="POST"><input type="text" name="productName" placeholder="اسم المنتج" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="productPrice" placeholder="السعر (دج)" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="productImage" placeholder="رابط صورة المنتج" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="colors" value="أسود، أبيض" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><input type="text" name="sizes" value="قياس موحد" required style="width:100%; padding:8px; margin:5px 0; border:1px solid #ccc; border-radius:5px;"><button type="submit" style="background:${store.storeColor || '#008060'}; color:#fff; border:none; padding:10px; width:100%; font-weight:bold; margin-top:10px; cursor:pointer; border-radius:5px;">إضافة المنتج ➕</button></form>`}<h3 style="margin-top:25px;">المنتجات</h3>${store.products.map((p, i) => `<div style="background:#f9fafb; padding:10px; border:1px solid #ddd; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span><b>${p.name}</b> - ${p.price}دج</span><form action="/store/${store.storeSlug}/delete-product" method="POST" style="margin:0;"><input type="hidden" name="productIndex" value="${i}"><button type="submit" style="background:red; color:#fff; border:none; padding:5px 10px; cursor:pointer; border-radius:4px;">حذف</button></form></div>`).join('')}</div></body></html>`);
 });
 
 app.post('/store/:slug/add-product', (req, res) => {
@@ -250,7 +277,7 @@ app.get('/store/:slug', (req, res) => {
                 <h1 style="font-size:20px; margin:0;">🛒 ${store.storeName}</h1>
                 <a href="/store/${store.storeSlug}/login" style="background:rgba(255,255,255,0.2); color:#fff; padding:6px 12px; text-decoration:none; border-radius:5px; font-size:13px;">لوحة التحكم ⚙️</a>
             </header>
-            <div style="max-width:800px; margin:30px auto; background:#fff; padding:25px; border-radius:10px; text-align:right;">
+            <div style="max-width:800px; margin:30px auto; background:#fff; padding:25px; border-radius:10px; text-align:right; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
                 <h3 style="text-align:center; color:${themeColor};">قائمة المنتجات</h3>
                 ${store.products.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد منتجات.</p>' : ''}
                 ${store.products.map(p => `
