@@ -53,15 +53,51 @@ app.get('/sw.js', (req, res) => {
     res.send(`self.addEventListener('fetch', (e) => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); });`);
 });
 
-function sendTelegramNotification(chatId, message) {
-    const token = db.siteSettings.telegramBotToken;
-    if (!token || !chatId) return;
-    https.get(`https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=Markdown`, () => {});
-}
-
 const states = ["01. أدرار", "02. الشلف", "03. الأغواط", "04. أم البواقي", "05. باتنة", "06. بجاية", "07. بسكرة", "08. بشار", "09. البليدة", "10. البويرة", "11. تمنراست", "12. تبسة", "13. تلمسان", "14. تيارت", "15. تيزي وزو", "16. الجزائر", "17. الجلفة", "18. جيجل", "19. سطيف", "20. سعيدة", "21. سكيكدة", "22. سيدي بلعباس", "23. عنابة", "24. قالمة", "25. قسنطينة", "26. المدية", "27. مستغانم", "28. المسيلة", "29. معسكر", "30. ورقلة", "31. وهران", "32. البيض", "33. إليزي", "34. برج بوعريريج", "35. بومرداس", "36. الطارف", "37. تندوف", "38. تسيمسيلت", "39. الوادي", "40. خنشلة", "41. سوق اهراس", "42. تيبازة", "43. ميلة", "44. عين الدفلى", "45. نعامة", "46. عين تيموشنت", "47. غرداية", "48. غليزان", "49. المغير", "50. المنيعة", "51. أولاد جلال", "52. برج باجي مختار", "53. بني عباس", "54. تيميمون", "55. تقرت", "56. جانت", "57. المغير", "58. المنيعة", "59. تيزي وزو", "60. برج عجيال", "61. مسعد", "62. أفلو", "63. الأبيضسيد الشيخ", "64. قصر الشلالة", "65. عين صالح", "66. عين قزام", "67. الرويسات", "68. مسيسة", "69. البرمة"];
+
+// الصفحة الرئيسية (الأزرار تحت بعضها + دخول المدير عبر اسم المنصة)
 app.get('/', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>ClickShop</title><link rel="manifest" href="/manifest.json"></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:40px; max-width:500px; margin:auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1);"><h1 style="color:#008060;">🛒 منصة ClickShop</h1><p>أنشئ متجرك الإلكتروني بكل سهولة</p><a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; margin:10px 0; border-radius:8px; text-decoration:none; font-weight:bold;">إنشاء متجر جديد 🚀</a><a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; margin:10px 0; border-radius:8px; text-decoration:none; font-weight:bold;">تسجيل دخول التاجر ⚙️</a></div></body></html>`);
+    res.send(`
+        <html dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <title>ClickShop</title>
+            <link rel="manifest" href="/manifest.json">
+        </head>
+        <body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center; margin:0;">
+            <div style="background:#fff; padding:40px; max-width:450px; margin:40px auto; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:center;">
+                <h1 style="color:#008060; margin-bottom:10px; cursor:pointer;" onclick="window.location.href='/admin-dashboard'" title="لوحة تحكم المدير العام">🛒 منصة ClickShop</h1>
+                <p style="color:#666; margin-bottom:30px;">أنشئ متجرك الإلكتروني بكل سهولة وقم بإدارة أعمالك باحترافية</p>
+                
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <a href="/register-page" style="display:block; background:#008060; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; box-shadow:0 2px 5px rgba(0,128,96,0.2);">إنشاء متجر جديد 🚀</a>
+                    <a href="/login-store" style="display:block; background:#2563eb; color:#fff; padding:14px; border-radius:8px; text-decoration:none; font-weight:bold; box-shadow:0 2px 5px rgba(37,99,235,0.2);">تسجيل دخول التجار ⚙️</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
+
+// لوحة تحكم المدير العام البسيطة
+app.get('/admin-dashboard', (req, res) => {
+    res.send(`
+        <html dir="rtl">
+        <head><meta charset="UTF-8"><title>لوحة المدير العام</title></head>
+        <body style="font-family:Tahoma; background:#f3f4f6; padding:30px; text-align:center;">
+            <div style="background:#fff; padding:30px; max-width:600px; margin:auto; border-radius:10px; text-align:right;">
+                <h2 style="color:#008060; text-align:center;">لوحة تحكم المدير العام 🛠️</h2>
+                <hr>
+                <p><b>عدد المتاجر النشطة:</b> ${db.stores.length}</p>
+                <p><b>الأكواد المفعلة:</b> ${db.activeCodes.length} كود متاح</p>
+                <h3 style="margin-top:20px;">المتاجر المسجلة:</h3>
+                ${db.stores.length === 0 ? '<p style="color:#666;">لا توجد متاجر بعد.</p>' : ''}
+                ${db.stores.map(s => `<div style="background:#f9fafb; padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b> (${s.storeSlug})</span><a href="/store/${s.storeSlug}" target="_blank" style="background:#008060; color:#fff; padding:5px 10px; text-decoration:none; border-radius:4px; font-size:12px;">زيارة المتجر</a></div>`).join('')}
+                <br><a href="/" style="display:block; text-align:center; color:#555; text-decoration:none; margin-top:20px;">← عودة للرئيسية</a>
+            </div>
+        </body>
+        </html>
+    `);
 });
 
 app.get('/register-page', (req, res) => {
@@ -69,7 +105,7 @@ app.get('/register-page', (req, res) => {
 });
 
 app.get('/login-store', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555;">الرئيسية</a></div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:40px; text-align:center;"><div style="background:#fff; padding:30px; max-width:450px; margin:auto; border-radius:10px; text-align:right;"><h2 style="color:#008060; text-align:center;">اختر متجرك للدخول</h2>${db.stores.length === 0 ? '<p style="text-align:center; color:#666;">لا توجد متاجر مسجلة بعد.</p>' : ''}${db.stores.map(s => `<div style="background:#f9fafb; padding:12px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><span><b>${s.storeName}</b></span><a href="/store/${s.storeSlug}/login" style="background:#2563eb; color:#fff; padding:6px 12px; text-decoration:none; border-radius:4px; font-size:13px;">دخول ⚙️</a></div>`).join('')}<br><a href="/" style="display:block; text-align:center; color:#555;">الرئيسية</a></div></body></html>`);
 });
 
 app.post('/register', (req, res) => {
@@ -86,7 +122,7 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/store/:slug/login', (req, res) => {
-    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;"><div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px;"><h2>كلمة مرور المتجر</h2><form action="/store/${req.params.slug}/auth" method="POST"><input type="password" name="password" required style="width:100%; padding:10px; margin:15px 0;"><button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold;">دخول</button></form></div></body></html>`);
+    res.send(`<html dir="rtl"><head><meta charset="UTF-8"><title>دخول التاجر</title></head><body style="font-family:Tahoma; background:#f3f4f6; padding:50px; text-align:center;"><div style="background:#fff; padding:30px; max-width:400px; margin:auto; border-radius:10px;"><h2>كلمة مرور المتجر</h2><form action="/store/${req.params.slug}/auth" method="POST"><input type="password" name="password" required style="width:100%; padding:10px; margin:15px 0;"><button type="submit" style="width:100%; background:#008060; color:#fff; padding:10px; border:none; border-radius:5px; font-weight:bold;">دخول</button></form><br><a href="/login-store" style="color:#555; text-decoration:none; font-size:13px;">← اختيار متجر آخر</a></div></body></html>`);
 });
 
 app.post('/store/:slug/auth', (req, res) => {
@@ -97,6 +133,7 @@ app.post('/store/:slug/auth', (req, res) => {
         res.send(`<script>alert('كلمة المرور خطأ!'); window.location.href='/store/${req.params.slug}/login';</script>`);
     }
 });
+
 app.get('/store/:slug/dashboard', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
@@ -120,6 +157,7 @@ app.post('/store/:slug/delete-product', (req, res) => {
     }
     res.redirect(`/store/${req.params.slug}/dashboard`);
 });
+
 app.post('/store/:slug/checkout', (req, res) => {
     const store = db.stores.find(s => s.storeSlug === req.params.slug);
     if (!store) return res.send('المتجر غير موجود');
