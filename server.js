@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -908,3 +909,5 @@ app.get('/store/:slug', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => { 
     console.log(`Server running on port ${PORT}`); 
 });
+
+const mongoose=require("mongoose");const StoreDoc=mongoose.models.StoreDoc||mongoose.model("StoreDoc",new mongoose.Schema({_id:String,db:mongoose.Schema.Types.Mixed},{_id:false}));mongoose.connect(process.env.MONGO_URI||process.env.MONGODB_URI).then(async()=>{console.log("MongoDB متصل");const d=await StoreDoc.findById("main_db");if(d&&d.db&&typeof db!=="undefined")db=d.db;setInterval(()=>{if(typeof db!=="undefined"&&mongoose.connection.readyState===1)StoreDoc.findByIdAndUpdate("main_db",{_id:"main_db",db},{upsert:true}).catch(()=>{});},5000);}).catch(e=>console.error("خطأ MongoDB:",e.message));
